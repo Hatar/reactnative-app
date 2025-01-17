@@ -1,0 +1,164 @@
+import React, {  useState } from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import Background from '../components/Background'
+import { COLORS, FONTS, SIZES } from '../constants';
+import logo from '../assets/logo.png'
+import TextInput from '../components/TextInput';
+import Buttons from '../components/Buttons';
+import { useNavigation } from '@react-navigation/native';
+import BackButton from '../components/BackButton';
+import { validateConfirmPassword, validationOtherFields, validationPassword } from '../helpers';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+
+const Signup =() => {
+    const navigation = useNavigation()
+    
+    const [firstname, setFirstname] = useState({ value: '', error: '' })
+    const [lastname, setLastname] = useState({ value: '', error: '' })
+    const [password,setPassword] = useState({value:'',error:''})
+    const [confirmPassword,setConfirmPassword] = useState({value:'',error:''})
+    
+
+    // Handlers
+   const onSignUpPressed = () => {
+        let isValid = true;
+
+        const firstNameError = validationOtherFields(firstname.value);
+        const lastNameError = validationOtherFields(lastname.value);
+        const passwordError = validationPassword(password.value);
+        const confirmPasswordError = validateConfirmPassword(password.value, confirmPassword.value);
+        
+
+        // start validtion fields
+       if (firstNameError) {
+            setFirstname((prev) => ({ ...prev, error: firstNameError }));
+            isValid = false;
+        }
+
+        if (lastNameError) {
+            setLastname((prev) => ({ ...prev, error: lastNameError }));
+            isValid = false;
+        }
+
+        if (passwordError) {
+            setPassword((prev) => ({ ...prev, error: passwordError }));
+            isValid = false;
+        }
+
+        if (confirmPasswordError) {
+            setConfirmPassword((prev) => ({ ...prev, error: confirmPasswordError }));
+            isValid = false;
+        }
+
+        if (isValid) {
+            console.log(firstname,lastname,password,confirmPassword)
+            navigation.navigate("Home")
+        }
+    }
+
+
+  return (
+    <Background>
+        <BackButton goBack={navigation.goBack} styleBackButton={styles.styleBackButton} />
+        <View style={styles.imageContainer}
+        >
+            <View style={styles.imageCard}>
+                <Image style={styles.image} source={logo}/>
+            </View>
+        </View>
+      
+        <TextInput 
+            placeholder={'Enter First Name'}
+            value={firstname.value}
+            errortext={firstname.error}
+            autoCapitalize="none"
+            returnKeyType="next"
+            onChangeText={(text) => setFirstname({ value: text, error: '' })}
+        />
+         <TextInput 
+            placeholder={'Enter Last Name'}
+            value={lastname.value}
+            errortext={lastname.error}
+            autoCapitalize="none"
+            returnKeyType="next"
+            onChangeText={(text) => setLastname({ value: text, error: '' })}
+        />
+        <TextInput 
+            placeholder={'Enter Your Password'}
+            value={password.value}
+            errortext={password.error}
+            secureTextEntry
+            returnKeyType="done"
+            onChangeText={(text) => setPassword({ value: text, error: '' })}
+        />
+        <TextInput 
+            placeholder={'Confirm Password'}
+            value={confirmPassword.value}
+            errortext={confirmPassword.error}
+            secureTextEntry
+            returnKeyType="done"
+            onChangeText={(text) => setConfirmPassword({ value: text, error: '' })}
+        />
+        <Buttons
+            title="Sign Up"
+            pressHandler={onSignUpPressed}
+            stylesText={styles.textButton}
+            stylesButton={styles.button}
+        />
+
+        <View style={styles.row}>
+            <Text>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.replace('Signin')}>
+            <Text style={styles.link}>Login</Text>
+            </TouchableOpacity>
+        </View>
+    </Background>
+  )
+}
+
+
+export const styles = StyleSheet.create({
+    imageContainer: {
+        top: -SIZES.small,
+        flexDirection: "row",
+        gap: SIZES.small,
+    },
+    imageCard: {
+        borderRadius: SIZES.medium,
+        padding: SIZES.small,
+        backgroundColor: COLORS.cardBg,
+    },
+    image: {
+        width: 80,
+        height: 80,
+        borderRadius: SIZES.medium,
+    },
+    button: {
+        backgroundColor: COLORS.second,
+        padding: SIZES.small + 4,
+        width: '80%',
+        alignItems: "center",
+        borderRadius: SIZES.medium,
+        marginVertical:10,
+    },
+    textButton: {
+        color: COLORS.white,
+        fontFamily: FONTS.semiBold,
+        fontSize: SIZES.large,
+    },
+    row: {
+        flexDirection: 'row',
+        marginTop: 4,
+    },
+    link: {
+        fontWeight: 'bold',
+        color: COLORS.bg,
+    },
+    styleBackButton:{
+        position:'absolute',
+        top: 10 + getStatusBarHeight(),
+        left: 4,
+    },
+})
+
+export default Signup
