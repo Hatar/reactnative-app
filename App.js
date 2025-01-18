@@ -11,8 +11,8 @@ import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import { COLORS } from './constants';
 import AboutUs from './screens/AboutUs';
 import CartIcon from './components/CartIcon';
-import Cart from './screens/Cart';
 import InfoFood from './screens/InfoFood';
+import Checkout from './screens/Checkout';
 
 export default function App() {
   // load Fonts App
@@ -57,7 +57,7 @@ export default function App() {
         <Drawer.Screen name="Home" component={Home} initialParams={{ title: 'Meals' }}  options={{ drawerItemStyle: { display: 'none' } }} />
         <Drawer.Screen name="Meals" component={Home} initialParams={{ title: 'Meals' }} />
         <Drawer.Screen name="Combos" component={Home} initialParams={{ title: 'Combos' }} />
-        <Drawer.Screen name="About Us" component={AboutUs} />
+        <Drawer.Screen name="About Us" component={AboutUs} options={{ headerShown: false }}  />
       </Drawer.Navigator>
     );
   }
@@ -77,7 +77,7 @@ export default function App() {
           <Stack.Screen name="Signin" component={Signin} />
           <Stack.Screen name="Signup" component={Signup} />
           <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
-          <Stack.Screen name='Cart' component={Cart} />
+          <Stack.Screen name='Checkout' component={Checkout} />
           <Stack.Screen name='InfoFood' component={InfoFood} />
         </Stack.Navigator>
       </NavigationContainer>

@@ -29,6 +29,7 @@ function Home({route}) {
               renderItem={({ item,index }) => 
                 <CustomeContent 
                   item={item} 
+                  isEnableChangeContent={false}
                   isLastItem={index === data.length - 1} 
                 />
               }

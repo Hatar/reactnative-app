@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 const CartIcon =() => {
   const navigation = useNavigation()
   return (
-    <TouchableOpacity style={styles.cart} onPress={() => navigation.navigate('Cart')}>
+    <TouchableOpacity style={styles.cart} onPress={() => navigation.navigate('Checkout')}>
          <Image
             source={ICONS.cart}
             resizeMode="contain"
