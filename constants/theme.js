@@ -6,6 +6,7 @@ import pizza from '../assets/pizza.png'
 import sandwich from '../assets/sandwich.png'
 import logo from '../assets/logo.png'
 import cart from '../assets/cart.png'
+import deleteIcon from '../assets/delete.png'
 
 import { Dimensions } from "react-native";
 const { width, height } = Dimensions.get("window");
@@ -23,6 +24,7 @@ export const SIZES = {
     height,
     padding: 10,
     padding2: 12,
+    radius: 30,
 }
 
 export const COLORS = {
@@ -51,7 +53,8 @@ export const ICONS = {
     pizza,
     sandwich,
     logo,
-    cart
+    cart,
+    deleteIcon
 }
 
 export const DATA_MEALS = [

@@ -1,33 +1,15 @@
 import React from 'react'
-import BackButton from '../components/BackButton'
-import { useNavigation } from '@react-navigation/native'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { COLORS, FONTS, SIZES } from '../constants'
-import CartIcon from '../components/CartIcon'
 import Buttons from '../components/Buttons'
 import pizza from '../assets/pizza.png'
 import star from '../assets/star.png'
+import Header from '../components/Header'
 
 const InfoFood =  () => {
-  const navigation = useNavigation()
 
   const addToCart = () => {
     console.log('start add to cart')  
-  }
-
-  const renderHeader = () => {
-    return (
-        <View style={styles.header}>
-            <BackButton goBack={navigation.goBack} />
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <View style={styles.category}>
-                    <Text style={styles.headerTitle}>Category (Meal)</Text>
-                </View>
-            </View>
-            <CartIcon />
-        </View>
-        
-    )  
   }
  
   const renderFoodInformation = () => {
@@ -90,7 +72,7 @@ const InfoFood =  () => {
   }
   return (
     <SafeAreaView style={styles.container}>
-        {renderHeader()}
+        <Header title={"Meal 11"} isEnableIcon={true}/>
         {renderFoodInformation()}
     </SafeAreaView>
   )
@@ -98,30 +80,9 @@ const InfoFood =  () => {
 
 
 export const  styles = StyleSheet.create({
-     container:{
+    container:{
         paddingTop: 15,
         flex:1,
-     },
-     header:{
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems:'center',
-        height:45,
-        marginHorizontal:10
-     },
-     category: {
-        height: '100%',
-        maxWidth: '80%',
-        backgroundColor: COLORS.cardBg,
-        paddingHorizontal: SIZES.medium * 3,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: SIZES.xLarge
-    },
-    headerTitle:{
-        color:COLORS.white,
-        fontFamily:FONTS.bold,
-        fontSize:SIZES.large,
     },
     food_image: {
         height: SIZES.height * 0.30,
