@@ -242,6 +242,7 @@ export const styles = StyleSheet.create({
     color: COLORS.bg,
   },
   section_articles:{
+    padding:18,
     marginHorizontal:0,
     marginBottom:15,
     borderRadius:0
