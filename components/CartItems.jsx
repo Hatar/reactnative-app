@@ -4,7 +4,7 @@ import pizza from '../assets/pizza.png'
 import { COLORS, FONTS, ICONS, SIZES } from '../constants'
 import Buttons from './Buttons'
 
-const CartItems =({orderList}) => {
+const CartItems =({orderList,navigation}) => {
   const renderItem = ({item}) =>{
     return (
         <TouchableOpacity style={styles.container}>
@@ -76,7 +76,7 @@ const CartItems =({orderList}) => {
             <View style={{ margin: SIZES.padding * 2, marginTop: 0 }}>
                 <Buttons
                     title='Confirm Order'
-                    pressHandler={() => console.log("confirm order")}
+                    pressHandler={() => navigation.navigate("Cart")}
                     stylesText={styles.textButton}
                     stylesButton={styles.button}
                 />

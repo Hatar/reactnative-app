@@ -24,17 +24,19 @@ function Home({route}) {
     <SafeAreaView style={styles.container}>
           <Text style={styles.title}>{contentTitle}</Text>
           <FlatList 
-              data={data}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item,index }) => 
-                <CustomeContent 
-                  item={item} 
-                  isEnableChangeContent={false}
-                  isLastItem={index === data.length - 1} 
-                />
-              }
-              numColumns={2} // Grid layout
-          />
+            data={data}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item,index }) => 
+              <CustomeContent 
+                item={item} 
+                isEnableChangeContent={false}
+                isLastItem={index === data.length - 1} 
+              />
+            }
+            numColumns={2} // Grid layout
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{overflow: "auto"}}
+          />          
     </SafeAreaView>
   )
 }

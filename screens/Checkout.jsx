@@ -3,8 +3,10 @@ import { SafeAreaView, StyleSheet, View,Text } from 'react-native'
 import Header from '../components/Header'
 import { ICONS } from '../constants'
 import CartItems from '../components/CartItems'
+import { useNavigation } from '@react-navigation/native'
 
 const Checkout =() => {
+  const navigation = useNavigation()
   const orderList = [
       { id: '1', title: 'MEALS', price: '$12.99', image: ICONS.biryani },
       { id: '2', title: 'MEALS', price: '$9.99', image: ICONS.pizza },
@@ -13,7 +15,7 @@ const Checkout =() => {
   return (
     <SafeAreaView style={styles.container}>
         <Header title={"Checkout"} isEnableIcon={false}/>
-        <CartItems orderList={orderList}/>
+        <CartItems orderList={orderList} navigation={navigation}/>
     </SafeAreaView>
   )
 }

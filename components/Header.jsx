@@ -10,11 +10,15 @@ const Header =({title,isEnableIcon}) =>{
   return (
     <View style={styles.header}>
         <BackButton goBack={navigation.goBack} />
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <View style={styles.category}>
-                <Text style={styles.headerTitle}>{title}</Text>
-            </View>
-        </View>
+        {
+            title && (
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={styles.category}>
+                        <Text style={styles.headerTitle}>{title}</Text>
+                    </View>
+                </View>
+            )
+        }
         {isEnableIcon && <CartIcon />}
     </View>
   )

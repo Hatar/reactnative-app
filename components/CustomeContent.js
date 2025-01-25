@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 
 const CustomeContent = ({item,isLastItem,isEnableChangeContent}) => {
   const navigation = useNavigation()
+
   const renderContentArticle = () => {
       return (
         <View>
@@ -17,6 +18,7 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent}) => {
         </View>
       )
   }
+
   const renderContentItemFood = () => {
     return (
       <View style={styles.infoSection}>
@@ -25,6 +27,7 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent}) => {
       </View>
     )
   }
+
   return (
       <TouchableOpacity style={[styles.itemContainer,isEnableChangeContent && styles.overideBackground,isLastItem && styles.lastItem]} onPress={() => {
             if(!isEnableChangeContent) {
@@ -66,7 +69,7 @@ export const styles = StyleSheet.create({
   },
   lastItem:{ 
     flex:0,
-    width:145,
+    width:170,
   },
   infoSection:{
     flexDirection:'row',

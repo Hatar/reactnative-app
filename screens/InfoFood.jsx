@@ -5,6 +5,7 @@ import Buttons from '../components/Buttons'
 import pizza from '../assets/pizza.png'
 import star from '../assets/star.png'
 import Header from '../components/Header'
+import { Platform } from 'react-native'
 
 const InfoFood =  () => {
 
@@ -13,10 +14,15 @@ const InfoFood =  () => {
   }
  
   const renderFoodInformation = () => {
+    
+    const marginTop = Platform.OS === "ios" ? 10 : 20
+    const marginBottom = Platform.OS === "ios" ? 10 : 10
+    const height = Platform.OS === "ios" ? 450 : 470
+
     return (
         <>
       
-            <View style={{ alignItems: 'center' }}>
+            <View style={{ alignItems: 'center',marginTop,marginBottom }}>
                 <View style={styles.food_image}>
                     <Image
                         source={pizza}
@@ -29,7 +35,7 @@ const InfoFood =  () => {
                 </View>
             </View>
 
-            <View style={styles.bottom_container}>
+            <View style={[styles.bottom_container, { height }]}>
                  {/* Title */}
                 <Text style={styles.name}>Meals 1</Text>
                 {/* Description */}
@@ -58,7 +64,7 @@ const InfoFood =  () => {
             </View>
 
             {/* Add to Cart Button */}
-            <View style={{ margin: 10 * 2, marginTop: 0 }}>
+            <View style={{ margin: 10 * 2, marginTop: Platform.OS === "ios" ? 0: 35 }}>
                 <Buttons
                     title="Add to Cart"
                     pressHandler={addToCart}

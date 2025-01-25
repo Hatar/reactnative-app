@@ -124,6 +124,7 @@ const AboutUs =() => {
                 isLastItem={false}
               />
             }
+            showsVerticalScrollIndicator={false}
           />
         </SafeAreaProvider>
     )
@@ -241,7 +242,7 @@ export const styles = StyleSheet.create({
     color: COLORS.bg,
   },
   section_articles:{
-    marginHorizontal:15,
+    marginHorizontal:0,
     marginBottom:15,
     borderRadius:0
   }

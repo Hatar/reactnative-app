@@ -13,6 +13,7 @@ import AboutUs from './screens/AboutUs';
 import CartIcon from './components/CartIcon';
 import InfoFood from './screens/InfoFood';
 import Checkout from './screens/Checkout';
+import Cart from './screens/Cart';
 
 export default function App() {
   // load Fonts App
@@ -73,12 +74,13 @@ export default function App() {
           }}
         >
           <Stack.Screen name="Welcome" component={Welcome} />
+          <Stack.Screen name='InfoFood' component={InfoFood} />
           <Stack.Screen name="Home" component={DrawerNavigator} />
           <Stack.Screen name="Signin" component={Signin} />
           <Stack.Screen name="Signup" component={Signup} />
           <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
           <Stack.Screen name='Checkout' component={Checkout} />
-          <Stack.Screen name='InfoFood' component={InfoFood} />
+          <Stack.Screen name='Cart' component={Cart} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
