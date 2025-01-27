@@ -1,5 +1,5 @@
 import React, {  useState } from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Background from '../components/Background'
 import { COLORS, FONTS, SIZES } from '../constants';
 import logo from '../assets/logo.png'
@@ -7,54 +7,77 @@ import TextInput from '../components/TextInput';
 import Buttons from '../components/Buttons';
 import { useNavigation } from '@react-navigation/native';
 import BackButton from '../components/BackButton';
-import { validateConfirmPassword, validationOtherFields, validationPassword } from '../helpers';
+import { validateConfirmPassword, validationOtherFields, validationPassword,validationEmail } from '../helpers';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { FIREBASE_AUTH } from '../firebase';
 
 const Signup =() => {
     const navigation = useNavigation()
     
     const [firstname, setFirstname] = useState({ value: '', error: '' })
     const [lastname, setLastname] = useState({ value: '', error: '' })
+    const [email,setEmail] = useState({value:'',error:''})
     const [password,setPassword] = useState({value:'',error:''})
     const [confirmPassword,setConfirmPassword] = useState({value:'',error:''})
-    
+    const [loading,setLoading] = useState(false)
+
 
     // Handlers
-   const onSignUpPressed = () => {
+    const onSignUpPressed = async () => {
         let isValid = true;
-
-        const firstNameError = validationOtherFields(firstname.value);
-        const lastNameError = validationOtherFields(lastname.value);
+    
+        // Validate input fields
+        const firstNameError = validationOtherFields("firstname",firstname.value);
+        const lastNameError = validationOtherFields("lastname",lastname.value);
+        const emailError = validationEmail(email.value);
         const passwordError = validationPassword(password.value);
         const confirmPasswordError = validateConfirmPassword(password.value, confirmPassword.value);
-        
-
-        // start validtion fields
-       if (firstNameError) {
-            setFirstname((prev) => ({ ...prev, error: firstNameError }));
-            isValid = false;
+    
+        // Validation
+        if (firstNameError) {
+          setFirstname((prev) => ({ ...prev, error: firstNameError }));
+          isValid = false;
         }
-
+    
         if (lastNameError) {
-            setLastname((prev) => ({ ...prev, error: lastNameError }));
-            isValid = false;
+          setLastname((prev) => ({ ...prev, error: lastNameError }));
+          isValid = false;
         }
-
+    
+        if (emailError) {
+          setEmail((prev) => ({ ...prev, error: emailError }));
+          isValid = false;
+        }
+    
         if (passwordError) {
-            setPassword((prev) => ({ ...prev, error: passwordError }));
-            isValid = false;
+          setPassword((prev) => ({ ...prev, error: passwordError }));
+          isValid = false;
         }
-
+    
         if (confirmPasswordError) {
-            setConfirmPassword((prev) => ({ ...prev, error: confirmPasswordError }));
-            isValid = false;
+          setConfirmPassword((prev) => ({ ...prev, error: confirmPasswordError }));
+          isValid = false;
         }
-
+    
+        // If all validations pass, proceed with Firebase authentication
         if (isValid) {
-            console.log(firstname,lastname,password,confirmPassword)
-            navigation.navigate("Home")
+            setLoading(true);
+    
+          try {
+            console.log('Attempting to create user...');
+            
+            // Create a new user with email and password
+            const response = await createUserWithEmailAndPassword(FIREBASE_AUTH, email.value, password.value);
+            if(response) navigation.navigate("Signin")    
+          } catch (error) {
+            console.error('Error during signup:', error.message);
+            setLoading(false)
+          } finally {
+            setLoading(false)
+          }
         }
-    }
+      };
 
 
   return (
@@ -75,13 +98,23 @@ const Signup =() => {
             returnKeyType="next"
             onChangeText={(text) => setFirstname({ value: text, error: '' })}
         />
-         <TextInput 
+        <TextInput 
             placeholder={'Enter Last Name'}
             value={lastname.value}
             errortext={lastname.error}
             autoCapitalize="none"
             returnKeyType="next"
             onChangeText={(text) => setLastname({ value: text, error: '' })}
+        />
+        <TextInput 
+            placeholder={'Enter Your Email'}
+            value={email.value}
+            errortext={email.error}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            returnKeyType="next"
+            onChangeText={(text) => setEmail({ value: text, error: '' })}
         />
         <TextInput 
             placeholder={'Enter Your Password'}
@@ -99,12 +132,17 @@ const Signup =() => {
             returnKeyType="done"
             onChangeText={(text) => setConfirmPassword({ value: text, error: '' })}
         />
-        <Buttons
-            title="Sign Up"
-            pressHandler={onSignUpPressed}
-            stylesText={styles.textButton}
-            stylesButton={styles.button}
-        />
+        {
+
+            loading  ? <ActivityIndicator size="large" color={COLORS.bg} /> : 
+                <Buttons
+                    title="Sign Up"
+                    pressHandler={onSignUpPressed}
+                    stylesText={styles.textButton}
+                    stylesButton={styles.button}
+                />
+        }
+        
 
         <View style={styles.row}>
             <Text>Already have an account? </Text>

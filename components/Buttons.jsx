@@ -12,7 +12,7 @@ const Buttons =({pressHandler,title,stylesText,Icon,stylesButton}) => {
 
   }
   return (
-    <TouchableOpacity style={stylesButton} onPress={pressHandler  && pressHandler}>
+    <TouchableOpacity style={stylesButton} onPress={pressHandler}>
         <RenderContentButton />
     </TouchableOpacity>
   )

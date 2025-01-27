@@ -1,5 +1,5 @@
-export function validationOtherFields(name) {
-  if (!name.trim()) return "Name can't be empty.";
+export function validationOtherFields(key,name) {
+  if (!name.trim()) return key + " can't be empty.";
   return '';
 }
 
