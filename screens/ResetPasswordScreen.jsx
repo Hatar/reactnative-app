@@ -1,5 +1,5 @@
 import React, {  useState } from 'react'
-import { Image, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native'
 import Background from '../components/Background'
 import { COLORS, FONTS, SIZES } from '../constants';
 import logo from '../assets/logo.png'
@@ -7,27 +7,43 @@ import TextInput from '../components/TextInput';
 import Buttons from '../components/Buttons';
 import { useNavigation } from '@react-navigation/native';
 import { validationEmail } from '../helpers';
-
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+import BackButton from '../components/BackButton';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { FIREBASE_AUTH } from '../firebase';
 const ResetPasswordScreen =() => {
 
-    const [email,setEmail] = useState({value:'test@alpha.com',error:''})
+    const [email,setEmail] = useState({value:'',error:''})
+    const [loading,setLoading] = useState(false)
     const navigation = useNavigation()
     
 
     // Handlers
-   const onPress = () => {
+   const onPress = async() => {
         const emailError = validationEmail(email.value)
+        setLoading(true);
         if (emailError) {
             setEmail({ ...email, error: emailError })
+            setLoading(false);
             return
         } else {
-            navigation.navigate('Signin')
-        }
+             try {
+                // reset password
+                await sendPasswordResetEmail(FIREBASE_AUTH, email.value);
+                navigation.navigate('Signin')
+                } catch (error) {
+                    setLoading(false);
+                    alert('Error during signup:', error.message);
+                } finally {
+                    setLoading(false)
+                }
+}
     }
 
 
   return (
     <Background>
+        <BackButton goBack={navigation.goBack} styleBackButton={styles.styleBackButton} />
         <View style={styles.imageContainer}
         >
             <View style={styles.imageCard}>
@@ -46,12 +62,18 @@ const ResetPasswordScreen =() => {
             onChangeText={(text) => setEmail({ value: text, error: '' })}
         />
 
-        <Buttons
-            title="Sign In"
-            pressHandler={onPress}
-            stylesText={styles.textButton}
-            stylesButton={styles.button}
-        />
+{
+
+            loading  ? <ActivityIndicator size="large" color={COLORS.bg} /> : 
+                <Buttons
+                    title="Sign In"
+                    pressHandler={onPress}
+                    stylesText={styles.textButton}
+                    stylesButton={styles.button}
+                />
+            }
+
+        
     </Background>
   )
 }
@@ -85,6 +107,11 @@ export const styles = StyleSheet.create({
         color: COLORS.white,
         fontFamily: FONTS.semiBold,
         fontSize: SIZES.large,
+    },
+    styleBackButton:{
+        position:'absolute',
+        top: 50 + getStatusBarHeight(),
+        left: 0,
     },
 })
 

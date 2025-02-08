@@ -22,8 +22,8 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent}) => {
   const renderContentItemFood = () => {
     return (
       <View style={styles.infoSection}>
-        <Text style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemPrice}>{item.price}</Text>
+        <Text ellipsizeMode='tail' numberOfLines={1} style={styles.itemTitle}>{item.title}</Text>
+        <Text style={styles.itemPrice}>{item.price}$</Text>
       </View>
     )
   }
@@ -31,11 +31,13 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent}) => {
   return (
       <TouchableOpacity style={[styles.itemContainer,isEnableChangeContent && styles.overideBackground,isLastItem && styles.lastItem]} onPress={() => {
             if(!isEnableChangeContent) {
-              navigation.navigate('InfoFood')
+              navigation.navigate('InfoFood',{
+                  item:item
+              })
             }
           }}>
           {!isEnableChangeContent &&
-            <Image source={item.image} style={!isEnableChangeContent ? styles.itemImage: styles.image_article} resizeMode="cover" />
+            <Image source={{uri:item.imageUrl}} style={!isEnableChangeContent ? styles.itemImage: styles.image_article} resizeMode="cover" />
           }
           {!isEnableChangeContent ? renderContentItemFood () : renderContentArticle()  }
       </TouchableOpacity>
@@ -87,6 +89,7 @@ export const styles = StyleSheet.create({
     fontSize: SIZES.large,
     fontFamily: FONTS.bold,
     color: COLORS.white,
+    width: 100
   },
   itemPrice: {
     fontSize: SIZES.large,

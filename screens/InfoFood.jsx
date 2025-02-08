@@ -2,19 +2,17 @@ import React from 'react'
 import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { COLORS, FONTS, SIZES } from '../constants'
 import Buttons from '../components/Buttons'
-import pizza from '../assets/pizza.png'
 import star from '../assets/star.png'
 import Header from '../components/Header'
 import { Platform } from 'react-native'
 
-const InfoFood =  () => {
-
+const InfoFood =  ({route}) => {
+  const {item} = route.params
   const addToCart = () => {
     console.log('start add to cart')  
   }
  
   const renderFoodInformation = () => {
-    
     const marginTop = Platform.OS === "ios" ? 10 : 20
     const marginBottom = Platform.OS === "ios" ? 10 : 10
     const height = Platform.OS === "ios" ? 450 : 470
@@ -25,11 +23,12 @@ const InfoFood =  () => {
             <View style={{ alignItems: 'center',marginTop,marginBottom }}>
                 <View style={styles.food_image}>
                     <Image
-                        source={pizza}
+                        source={{uri: item.imageUrl}}
                         resizeMode='contain'
                         style={{
                             width: SIZES.width - 24,
                             height: '95%',
+                            borderRadius: SIZES.medium ,
                         }} 
                     />
                 </View>
@@ -37,9 +36,9 @@ const InfoFood =  () => {
 
             <View style={[styles.bottom_container, { height }]}>
                  {/* Title */}
-                <Text style={styles.name}>Meals 1</Text>
+                <Text style={styles.name}>{item.title}</Text>
                 {/* Description */}
-                <Text style={styles.description}>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloribus, vitae nisi! Doloribus odit sunt ratione provident at enim est officiis praesentium incidunt, sit repellat, ipsa saepe. A aut totam fuga!</Text>
+                <Text style={styles.description}>{item.description}</Text>
                  {/* Duration */}
                 <View style={styles.row_container}>
                     <Text style={styles.duration_text}>Duration:</Text>
@@ -47,7 +46,7 @@ const InfoFood =  () => {
                 </View>
                 <View style={styles.row_container}>
                     {/* Price */}
-                    <Text style={styles.price}>$30</Text>
+                    <Text style={styles.price}>{item.price}$</Text>
                     {/* Rating */}
                     <View style={{ flexDirection: 'row',alignItems:'center' }}>
                         <Image
@@ -77,8 +76,9 @@ const InfoFood =  () => {
     )
   }
   return (
+    
     <SafeAreaView style={styles.container}>
-        <Header title={"Meal 11"} isEnableIcon={true}/>
+        <Header title={item.title} isEnableIcon={true}/>
         {renderFoodInformation()}
     </SafeAreaView>
   )
@@ -93,7 +93,7 @@ export const  styles = StyleSheet.create({
     food_image: {
         height: SIZES.height * 0.30,
         marginTop: 16,
-        paddingBottom: 20
+        paddingBottom: 20,
     },
     bottom_container: {
         position: 'absolute',

@@ -57,23 +57,3 @@ export const ICONS = {
     deleteIcon
 }
 
-export const DATA_MEALS = [
-    { id: '1', title: 'MEALS', price: '$12.99', image: ICONS.biryani },
-    { id: '2', title: 'MEALS', price: '$9.99', image: ICONS.pizza },
-    { id: '3', title: 'MEALS', price: '$11.49', image: ICONS.chinese },
-    { id: '4', title: 'MEALS', price: '$2.99', image: ICONS.desserts },
-    { id: '5', title: 'MEALS', price: '$7.49', image: ICONS.sandwich },
-    { id: '6', title: 'MEALS', price: '$7.49', image: ICONS.sandwich },
-    { id: '7', title: 'MEALS', price: '$7.49', image: ICONS.sandwich },
-];
-
-export const DATA_COMBOS = [
-    { id: '1', title: 'COMBOS', price: '$12.99', image: ICONS.biryani },
-    { id: '2', title: 'COMBOS', price: '$9.99', image: ICONS.pizza },
-    { id: '3', title: 'COMBOS', price: '$11.49', image: ICONS.chinese },
-    { id: '4', title: 'COMBOS', price: '$2.99', image: ICONS.desserts },
-    { id: '5', title: 'COMBOS', price: '$7.49', image: ICONS.sandwich },
-    { id: '6', title: 'COMBOS', price: '$7.49', image: ICONS.sandwich },
-    { id: '7', title: 'COMBOS', price: '$7.49', image: ICONS.sandwich },
-];
-

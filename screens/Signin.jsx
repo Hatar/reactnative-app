@@ -9,13 +9,16 @@ import { useNavigation } from '@react-navigation/native';
 import { validationEmail,validationPassword } from '../helpers';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FIREBASE_AUTH } from '../firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInFailure, signInStart, signInSuccess } from '../redux/slices/authSlice';
 const Signin =() => {
 
-    const [email,setEmail] = useState({value:'test@alpha.com',error:''})
-    const [password,setPassword] = useState({value:'123456',error:''})
-    const [loading,setLoading] = useState(false)
+    const [email,setEmail] = useState({value:'amine.hatar@gmail.com',error:''})
+    const [password,setPassword] = useState({value:'20252025',error:''})
     const navigation = useNavigation()
-    
+    const dispatch = useDispatch();
+    const loading = useSelector((state) => state.auth.loading);
+
 
     // Handlers
    const onPress = async () => {
@@ -25,18 +28,23 @@ const Signin =() => {
             setEmail({ ...email, error: emailError })
             setPassword({ ...password, error: passwordError })
             return
-        } else {
-            setLoading(true)
-            try {
-                const response = await signInWithEmailAndPassword(FIREBASE_AUTH,email.value,password.value)
-                if(response) navigation.navigate("Home") 
-            } catch (error) {
-                console.log("error:",error.message)
-                setLoading(false)
-            } finally {
-                setLoading(false)
+        } 
+        dispatch(signInStart())
+        try {
+            const response = await signInWithEmailAndPassword(FIREBASE_AUTH,email.value,password.value)
+            if(response) {
+                const userData ={
+                    email: response.user.email,
+                    role: email.value === "amine.hatar@gmail.com" ? "admin" : "user"
+                }
+                dispatch(signInSuccess(userData))
+                navigation.navigate('Home');
             }
+        } catch (error) {
+            dispatch(signInFailure(error.message));
+            console.log('Error:', error.message);
         }
+        
     }
     return (
         <Background>

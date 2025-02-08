@@ -194,7 +194,7 @@ export const styles = StyleSheet.create({
     },
     styleBackButton:{
         position:'absolute',
-        top: 10 + getStatusBarHeight(),
+        top: 50 + getStatusBarHeight(),
         left: 4,
     },
 })
