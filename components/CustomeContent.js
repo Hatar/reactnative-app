@@ -1,19 +1,43 @@
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { COLORS, FONTS, SIZES } from '../constants'
+import { COLORS, FONTS, ICONS, SIZES } from '../constants'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
+import Buttons from './Buttons'
 
-const CustomeContent = ({item,isLastItem,isEnableChangeContent}) => {
+const CustomeContent = ({item,isLastItem,isEnableChangeContent,handleDelete,handleEditFood}) => {
   const navigation = useNavigation()
+  const {categories} = useSelector((state)=> state.categories)
+  const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
+  const getNameOFCategory = categories.find((category) => category.id === item.categoryId)?.name
+
 
   const renderContentArticle = () => {
       return (
         <View>
-            <Image source={{ uri: item.image }} style={styles.image_article}/>
+            {
+              isAdmin && (
+                <View style={styles.actionsBtn}>
+                  <Buttons
+                      Icon={ICONS.EditIcon}
+                      pressHandler={handleEditFood}
+                      stylesButton={styles.button}
+                  />
+                  <Buttons
+                      Icon={ICONS.deleteIcon}
+                      pressHandler={handleDelete}
+                      stylesButton={styles.button}
+                  />
+                </View>
+              )
+            }
+            
+            <Image source={{ uri: item.image || item.imageUrl }} style={styles.image_article}/>
             <View style={{margin:15,gap:10,justifyContent:'center'}}>
+              {getNameOFCategory !== undefined ? <Text style={styles.article_title}>{getNameOFCategory}</Text> : ""}
               <Text style={styles.article_title}>{item.title}</Text>
-              <Text style={styles.article_title}>{item.author}</Text>
-              <Text style={styles.article_title}>{item.date}</Text>
+              <Text ellipsizeMode='tail' numberOfLines={1}  style={styles.article_title}>{item.author || item.description}</Text>
+              <Text style={styles.article_title}>{item.date || `${item.price}$`}</Text>
             </View>
         </View>
       )
@@ -95,17 +119,6 @@ export const styles = StyleSheet.create({
     fontSize: SIZES.large,
     color: COLORS.white,
   },
-  button: {
-    backgroundColor: COLORS.second,
-    width: 25,
-    height: 25,
-    justifyContent:'center',
-    alignItems: "center",
-    borderRadius: 20,
-    position:'absolute',
-    right:-3,
-    top:-118
-  },
   textButton: {
     color: COLORS.white,
     fontFamily: FONTS.bold + 10,
@@ -121,7 +134,22 @@ export const styles = StyleSheet.create({
     color:COLORS.cardBg,
     fontSize: SIZES.medium,
     fontWeight:500
-  }
+  },
+  actionsBtn:{
+    position:'absolute',
+    right:10,
+    top:10,
+    zIndex:10,
+    flexDirection: "row",
+    gap: 5,
+
+  },
+  button: {
+    backgroundColor: COLORS.white,
+    padding: SIZES.small,
+    alignItems: "center",
+    borderRadius: SIZES.medium,
+  },
 
 })
 

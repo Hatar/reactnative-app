@@ -7,21 +7,20 @@ import Foods from './Foods'
 
 const Dashboard =  () => {  
   const [tabName,setTabName] = useState("categories")
-
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
         <View style={styles.section_btns}>
             <Buttons
                 title="Categories"
                 pressHandler={() =>setTabName("categories")}
                 stylesText={styles.textButton}
-                stylesButton={styles.button}
+                stylesButton={[styles.button,tabName === "categories" && styles.activeButton,]}
             />
             <Buttons
                 title="Foods"
                 pressHandler={() =>setTabName("foods")}
                 stylesText={styles.textButton}
-                stylesButton={styles.button}
+                stylesButton={[styles.button,tabName === "foods" && styles.activeButton,]}
             />
         </View>
         {
@@ -33,6 +32,10 @@ const Dashboard =  () => {
 
 
 export const  styles = StyleSheet.create({
+    container:{
+      paddingTop: 15,
+      flex:1,
+  },
     section_btns:{
       flexDirection:"row",
       gap:10
@@ -48,6 +51,9 @@ export const  styles = StyleSheet.create({
         color: COLORS.white,
         fontFamily: FONTS.semiBold,
         fontSize: SIZES.large,
+    },
+    activeButton: {
+      backgroundColor: COLORS.errors, // Change this to highlight the active button
     },
 
 })

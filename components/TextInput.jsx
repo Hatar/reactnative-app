@@ -4,7 +4,7 @@ import { COLORS, SIZES } from '../constants'
 
 const TextInput =({errortext,...props}) => {
   return (
-    <View style={styles.container}>
+    <View style={props.customWrapperInput ? props.customWrapperInput : styles.container}>
         <Input
             style={ props.customInput ? props.customInput : styles.input}
             {...props}

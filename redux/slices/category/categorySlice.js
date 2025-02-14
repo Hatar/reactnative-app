@@ -42,10 +42,7 @@ const categorySlice = createSlice({
         }),
         builder.addCase(actAddCategory.fulfilled, (state, action) => {
             state.loading = "succeeded";
-            const categoryExists = state.categories.some(
-            (category) => category.name === action.payload.name
-            );
-        
+            const categoryExists = state.categories.some((category) => category.id === action.payload.id);
             if (!categoryExists) {
             state.categories = [...state.categories, action.payload];
             }

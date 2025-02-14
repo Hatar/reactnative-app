@@ -63,7 +63,7 @@ const Categories = () => {
     );
 
     return (
-        <SafeAreaView>
+        <>
             <Text style={styles.title}>Add New Category</Text>
 
             {/* Input and Button */}
@@ -112,7 +112,7 @@ const Categories = () => {
                     <Text>No Categories Right Now!!!</Text>
                 </View>
             )}
-        </SafeAreaView>
+        </>
     );
 };
 
