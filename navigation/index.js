@@ -75,7 +75,6 @@ const Navigation = () => {
           ...prevMenuItems,
         ]);
 
-        console.log("Fetched categories:", categoriesData);
       });
 
       return () => unsubscribe();

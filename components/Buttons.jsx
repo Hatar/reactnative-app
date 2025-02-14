@@ -1,13 +1,19 @@
 import React from 'react'
-import { Text, TouchableOpacity } from 'react-native'
+import { Image,Text, TouchableOpacity } from 'react-native'
 
 const Buttons =({pressHandler,title,stylesText,Icon,stylesButton}) => {
- 
   const RenderContentButton = () => {
     if(!Icon) {
             return <Text style={stylesText}>{title && title}</Text>
         } else {
-            Icon
+            return <Image
+                source={Icon}
+                resizeMode="contain"
+                style={{
+                    width: 25,
+                    height: 25,
+                }}
+              />
         }
 
   }

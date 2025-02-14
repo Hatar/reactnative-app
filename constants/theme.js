@@ -6,7 +6,9 @@ import pizza from '../assets/pizza.png'
 import sandwich from '../assets/sandwich.png'
 import logo from '../assets/logo.png'
 import cart from '../assets/cart.png'
-import deleteIcon from '../assets/delete.png'
+import deleteIcon from '../assets/dlt.png'
+import EditIcon from '../assets/editer.png'
+import AddIcon from '../assets/add.png'
 
 import { Dimensions } from "react-native";
 const { width, height } = Dimensions.get("window");
@@ -54,6 +56,8 @@ export const ICONS = {
     sandwich,
     logo,
     cart,
-    deleteIcon
+    deleteIcon,
+    EditIcon,
+    AddIcon
 }
 

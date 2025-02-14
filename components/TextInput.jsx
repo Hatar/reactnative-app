@@ -6,7 +6,7 @@ const TextInput =({errortext,...props}) => {
   return (
     <View style={styles.container}>
         <Input
-            style={styles.input}
+            style={ props.customInput ? props.customInput : styles.input}
             {...props}
         />
         {errortext ? <Text style={styles.error}>{errortext}</Text> : null}

@@ -1,5 +1,3 @@
-import { useSelector } from "react-redux";
-
 export function validationOtherFields(key,name) {
   if (!name.trim()) return key + " can't be empty.";
   return '';
@@ -31,10 +29,3 @@ export const capitalize = (string) => {
   return firstLetter.toUpperCase() + restOfWord.join('')
 }
 
-
-export const retrieveScreenAdmin = () => {
-  const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
-  if (isAdmin) {
-    return [{ id: menuItems.length + 1, label: 'Dashboard', navigateTo: 'Dashboard', icon: settingsIcon }]
-  } else return []
-}
