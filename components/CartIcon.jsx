@@ -2,9 +2,11 @@ import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { COLORS, FONTS, ICONS, SIZES } from '../constants'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
 
 const CartIcon =() => {
   const navigation = useNavigation()
+  const {items} = useSelector((state) => state.carts)
   return (
     <TouchableOpacity style={styles.cart} onPress={() => navigation.navigate('Checkout')}>
          <Image
@@ -16,7 +18,7 @@ const CartIcon =() => {
             }}
           />
           <View style={styles.num}>
-            <Text style={styles.text}>{15}</Text>
+            <Text style={styles.text}>{items.length}</Text>
         </View>
     </TouchableOpacity>
   )

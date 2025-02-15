@@ -5,11 +5,18 @@ import Buttons from '../components/Buttons'
 import star from '../assets/star.png'
 import Header from '../components/Header'
 import { Platform } from 'react-native'
+import { addItemToCart } from '../redux/slices/cart/cartSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { isIncludeInCart } from '../helpers'
 
 const InfoFood =  ({route}) => {
   const {item} = route.params
+  const {items} = useSelector((state)=>state.carts)
+  const dispatch = useDispatch();
   const addToCart = () => {
-    console.log('start add to cart')  
+    if(!isIncludeInCart(items,item)) {
+        dispatch(addItemToCart(item))
+    }
   }
  
   const renderFoodInformation = () => {
@@ -66,7 +73,7 @@ const InfoFood =  ({route}) => {
             <View style={{ margin: 10 * 2, marginTop: Platform.OS === "ios" ? 0: 35 }}>
                 <Buttons
                     title="Add to Cart"
-                    pressHandler={addToCart}
+                    pressHandler={() =>addToCart()}
                     stylesText={styles.textButton}
                     stylesButton={styles.button}
                 />

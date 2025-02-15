@@ -1,234 +1,214 @@
-import React from 'react'
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import pizza from '../assets/pizza.png'
-import { COLORS, FONTS, ICONS, SIZES } from '../constants'
-import Buttons from './Buttons'
+import React, { useCallback } from "react";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  Pressable,
+  View,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
+import { COLORS, ICONS, SIZES } from "../constants";
+import Buttons from "./Buttons";
+import { useDispatch, useSelector } from "react-redux";
+import { decreaseQuantity, deleteItemFromCart, increaseQuantity } from "../redux/slices/cart/cartSlice";
 
-const CartItems =({orderList,navigation}) => {
-  const renderItem = ({item}) =>{
-    return (
-        <TouchableOpacity style={styles.container}>
-            {/* Image */}
-            <Image
-                source={pizza}
-                resizeMode='contain'
-                style={styles.image} 
-            />
+const CartItems = ({ orderList, navigation }) => {
+  const {total} = useSelector((state) =>state.carts)
+  const dispatch = useDispatch();
 
-            <View style={styles.name_price_container}>
-
-                <Text style={styles.name}>Lorem ipsum dolor sit amet consectetur.</Text>
-                <Text style={styles.price}>{item.price}</Text>
-
-                {/* Delete Image */}
-                <TouchableOpacity style={styles.delete} onPress={() => console.log("delete item")}>
-                    <Image
-                        source={ICONS.deleteIcon}
-                        resizeMode='contain'
-                        style={{
-                            height: 40,
-                            width: 40,
-                            tintColor: 'red'
-                        }} />
-                </TouchableOpacity>
-
-                <View style={styles.qty_container}>
-                    {/* decrease qty */}
-                    <TouchableOpacity style={styles.decrease_qty}
-                        onPress={() => console.log("decrease qty")}>
-                        <Text style={styles.change_qty_text}>-</Text>
-                    </TouchableOpacity>
-
-                    {/* Quantity */}
-                    <View style={styles.section_qty}>
-                        <Text style={styles.qty}>2</Text>
-                    </View>
-
-                    {/* increase qty */}
-                    <TouchableOpacity style={styles.increase_qty}
-                        onPress={() => console.log("increase qty")}>
-                        <Text style={styles.change_qty_text}>+</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </TouchableOpacity>
-    )
+  const deleteItem = (item) =>{
+    dispatch(deleteItemFromCart(item))
   }
 
-  return (
-    <View style={{flex:1,marginTop: SIZES.padding * 3 }}>
-        <FlatList
-            data={orderList}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={{
-                padding: 16,
-            }}    
-        />
+  const increaseQty = useCallback((item) => {
+    dispatch(increaseQuantity(item));
+  },[dispatch])
 
-        <View style={styles.bottom_container}>
-            {/* Total */}
-            <View style={styles.total}>
-                <Text style={styles.total_text}>Total:</Text>
-                <Text style={styles.total_text}>$ 199</Text>
-            </View>
-            {/* Order Button */}
-            <View style={{ margin: SIZES.padding * 2, marginTop: 0 }}>
-                <Buttons
-                    title='Confirm Order'
-                    pressHandler={() => navigation.navigate("Cart")}
-                    stylesText={styles.textButton}
-                    stylesButton={styles.button}
-                />
-            </View>
+  const decreaseQty = useCallback((item) => {
+    dispatch(decreaseQuantity(item));
+  },[dispatch])
+
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <Pressable
+        style={styles.deleteButton}
+        onPress={() => deleteItem(item)}
+      >
+        <Image source={ICONS.deleteIcon} style={styles.deleteIcon} />
+      </Pressable>
+      <Image source={{ uri: item.imageUrl }} style={styles.image} />
+      <View style={styles.detailsContainer}>
+        <Text style={styles.name}>{item.title}</Text>
+        <Text style={styles.price}>${item.price}</Text>
+        <View style={styles.actionsContainer}>
+          <Pressable
+            style={styles.qtyButton}
+            onPress={() => decreaseQty(item)}
+          >
+            <Text style={styles.qtyText}>-</Text>
+          </Pressable>
+          <Text style={styles.quantity}>{item.quantity}</Text>
+          <Pressable
+            style={styles.qtyButton}
+            onPress={() => increaseQty(item)}
+          >
+            <Text style={styles.qtyText}>+</Text>
+          </Pressable>
         </View>
-        
+      </View>
     </View>
-  )
-}
-export const styles = StyleSheet.create({
-    container: {
-        margin: 8,
-        elevation: 3,
-        width: SIZES.width - 45,
-        height: 120,
-        borderRadius: SIZES.radius,
-        backgroundColor: COLORS.white
-    },
+  );
 
-    image: {
-        position: 'absolute',
-        marginLeft: 8,
-        width: '30%',
-        height: '100%',
-        borderRadius: SIZES.radius,
-    },
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <FlatList
+          data={orderList}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+        />
+      </ScrollView>
+      <View style={styles.footer}>
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalText}>Total:</Text>
+          <Text style={styles.totalAmount}>${total}</Text>
+        </View>
+        <Buttons
+          title="Confirm Order"
+          pressHandler={() => navigation.navigate("Cart")}
+          stylesText={styles.buttonText}
+          stylesButton={styles.button}
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
 
-    name_price_container: {
-        padding: SIZES.padding,
-        position: 'absolute',
-        right: 0,
-        height: '100%',
-        width: '65%',
-    },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: 15,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 120,
+  },
+  listContent: {
+    paddingBottom: 120,
+  },
+  card: {
+    flexDirection: "row",
+    borderRadius: SIZES.radius,
+    padding: SIZES.padding,
+    marginBottom: SIZES.padding,
+    alignItems: "center",
+    position: "relative",
+    borderWidth: 1,
+    borderColor: COLORS.cardBg,
+    marginHorizontal: 10,
+  },
+  deleteButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 1,
+    padding: SIZES.base,
+  },
+  deleteIcon: {
+    width: 24,
+    height: 24,
+    tintColor: COLORS.red,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: SIZES.radius,
+    marginRight: SIZES.padding,
+  },
+  detailsContainer: {
+    flex: 1,
+  },
+  name: {
+    fontSize: SIZES.large,
+    fontWeight: "bold",
+    color: COLORS.black,
+  },
+  price: {
+    fontSize: SIZES.medium,
+    color: COLORS.primary,
+    marginBottom: SIZES.base,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  qtyButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: COLORS.cardBg,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 10,
+  },
+  qtyText: {
+    fontSize: SIZES.large,
+    fontWeight: "bold",
+    color: COLORS.white,
+  },
+  quantity: {
+    fontSize: SIZES.large,
+    fontWeight: "bold",
+  },
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: COLORS.white,
+    paddingVertical: SIZES.padding * 2,
+    paddingHorizontal: SIZES.padding,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  totalContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingBottom: SIZES.base,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.white,
+  },
+  totalText: {
+    fontSize: SIZES.xLarge,
+    fontWeight: "bold",
+    color: COLORS.cardBg,
+  },
+  totalAmount: {
+    fontSize: SIZES.xLarge,
+    fontWeight: "bold",
+    color: COLORS.yellow,
+  },
+  button: {
+    marginTop: SIZES.padding,
+    backgroundColor: COLORS.cardBg,
+    padding: SIZES.medium,
+    borderRadius: SIZES.radius,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontSize: SIZES.medium,
+    fontWeight: "bold",
+  },
+});
 
-    name: {
-        fontWeight:500,
-        color: COLORS.black,
-        width: (SIZES.width - (SIZES.padding * 20))
-    },
-
-    price: {
-        fontWeight:500,
-        color: COLORS.errors
-    },
-
-    delete: {
-        width: 30,
-        height: 30,
-        position: 'absolute',
-        top: SIZES.padding,
-        right: SIZES.padding,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    delete: {
-        width: 30,
-        height: 30,
-        position: 'absolute',
-        top: SIZES.padding,
-        right: SIZES.padding,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-
-    qty_container: {
-        position: 'absolute',
-        bottom: 6,
-        right: 15,
-        height: 40,
-        justifyContent: 'center',
-        flexDirection: 'row'
-    },
-
-    section_qty: {
-        width: 33,
-        backgroundColor: COLORS.gray,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-
-    qty:{
-        fontFamily:FONTS.bold,
-        fontSize:18
-    },
-
-    decrease_qty: {
-        width: 33,
-        backgroundColor: COLORS.gray,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderTopLeftRadius: 20,
-        borderBottomLeftRadius: 20
-    },
-
-    increase_qty: {
-        width: 30,
-        backgroundColor: COLORS.gray,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderTopRightRadius: 20,
-        borderBottomRightRadius: 20
-    },
-
-    change_qty_text: {
-        fontWeight:400,
-        color: COLORS.black
-    },
-
-    bottom_container: {
-        position: 'relative',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        elevation: 5,
-        backgroundColor: COLORS.white,
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-    },
-
-    total: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: SIZES.padding * 2,
-        marginHorizontal: SIZES.padding * 3,
-        borderBottomColor: COLORS.gray,
-        borderBottomWidth: 2
-    },
-
-    total_text: {
-        marginLeft: SIZES.padding,
-        color: COLORS.black,
-        fontSize:SIZES.large,
-        fontWeight:500
-    },
-
-    button: {
-        backgroundColor: COLORS.bg,
-        marginTop: SIZES.padding * 3,
-        padding: SIZES.small + 4,
-        alignItems: "center",
-        borderRadius: SIZES.medium,
-        marginVertical:10,
-    },
-    textButton: {
-        color: COLORS.white,
-        fontFamily: FONTS.semiBold,
-        fontSize: SIZES.large,
-    },
-})
-export default CartItems
+export default CartItems;

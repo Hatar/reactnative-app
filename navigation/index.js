@@ -7,7 +7,7 @@ import Welcome from "../screens/Welcome";
 import Signin from "../screens/Signin";
 import Signup from "../screens/Signup";
 import ResetPasswordScreen from "../screens/ResetPasswordScreen";
-import { COLORS } from "../constants";
+import { COLORS, ICONS } from "../constants";
 import AboutUs from "../screens/AboutUs";
 import CartIcon from "../components/CartIcon";
 import InfoFood from "../screens/InfoFood";
@@ -15,77 +15,38 @@ import Checkout from "../screens/Checkout";
 import Cart from "../screens/Cart";
 import AdminScreen from "../screens/AdminScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
-import settingsIcon from "../assets/settings.png";
 import aboutIcon from "../assets/information-button.png";
-import SignOutIcon from "../assets/logout.png";
-import MealIcon from "../assets/meal.png";
-import CombosIcon from "../assets/combos.png";
 import { useSelector } from "react-redux";
-import { FIREBASE_DB } from "../firebase";
-import { useEffect, useState } from "react";
-import { capitalize } from "../helpers";
-import { collection, onSnapshot } from "firebase/firestore";
+import Categories from "../screens/Categories";
+import Foods from "../screens/Foods";
 
 const Navigation = () => {
-  const [menuItems, setMenuItems] = useState([
+  const menuItems = [
+    { label: "Home", navigateTo: "Home", icon: ICONS.logo },
+    {
+      label: "Categories",
+      navigateTo: "Categories",
+      icon: ICONS.combosIcon,
+    },
+    {
+      label: "Foods",
+      navigateTo: "Foods",
+      icon: ICONS.mealIcon,
+    },
     { label: "About Us", navigateTo: "About Us", icon: aboutIcon },
-  ]);
+  ]
   const Stack = createNativeStackNavigator();
   const Drawer = createDrawerNavigator();
 
-  const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
-  
-  useEffect(() => {
-    if (isAdmin) {
-      setMenuItems((prevMenuItems) => {
-        const alreadyExists = prevMenuItems.some(
-          (item) => item.label === "Admin"
-        );
-        if (alreadyExists) return prevMenuItems;
 
-        return [
-          {
-            id: prevMenuItems.length + 1,
-            label: "Admin",
-            navigateTo: "Admin",
-            icon: settingsIcon,
-          },
-          ...prevMenuItems,
-        ];
-      });
-    }
-  }, [isAdmin]);
-
-  useEffect(() => {
-    const getCategories = async () => {
-      const categoriesColl = collection(FIREBASE_DB, "categories");
-      const unsubscribe = onSnapshot(categoriesColl, (snapshot) => {
-        const categoriesData = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-
-        setMenuItems((prevMenuItems) => [
-          ...categoriesData.map((category) => ({
-            label: capitalize(category.name),
-            navigateTo: capitalize(category.name),
-            id: category.id,
-            icon: category.name === "meals" ? MealIcon : CombosIcon,
-          })),
-          ...prevMenuItems,
-        ]);
-
-      });
-
-      return () => unsubscribe();
-    };
-
-    getCategories();
-  }, []);
 
   const CustomDrawerContent = ({ navigation }) => {
+    const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated)
+    const filteredMenuItems = isAdmin
+      ? menuItems
+      : menuItems.filter(item => item.label !== "Categories" && item.label !== "Foods");
     const userMenuItems = [
-      { label: "Sign Out", navigateTo: "Signin", icon: SignOutIcon },
+      { label: "Sign Out", navigateTo: "Signin", icon: ICONS.SignOutIcon },
     ];
 
     const renderMenuItems = (items) => {
@@ -112,7 +73,7 @@ const Navigation = () => {
       <SafeAreaView style={{ flex: 1 }}>
         <AdminScreen />
         <View style={styles.content_slider}>
-          <View>{renderMenuItems(menuItems)}</View>
+          <View>{renderMenuItems(filteredMenuItems)}</View>
           <View>{renderMenuItems(userMenuItems)}</View>
         </View>
       </SafeAreaView>
@@ -126,10 +87,10 @@ const Navigation = () => {
     const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
     const getComponentForMenu = (label) => {
       switch (label) {
-        case "Meals":
-        case "Combos":
-        case "Juice":
-          return Home;
+        case "Foods":
+          return Foods
+        case "Categories":
+          return Categories
         case "About Us":
           return AboutUs;
         default:
@@ -191,7 +152,8 @@ const Navigation = () => {
         <Stack.Screen name="InfoFood" component={InfoFood} />
         <Stack.Screen name="Home" component={DrawerNavigator} />
         <Stack.Screen name="Signin" component={Signin} />
-        <Stack.Screen name="Admin" component={AdminScreen} />
+        <Stack.Screen name="Categories" component={Categories} />
+        <Stack.Screen name="Foods" component={Foods} />
         <Stack.Screen name="Signup" component={Signup} />
         <Stack.Screen
           name="ResetPasswordScreen"

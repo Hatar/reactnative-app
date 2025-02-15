@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import Buttons from "../components/Buttons";
 import TextInput from "../components/TextInput";
 import { COLORS, FONTS,SIZES } from "../constants";
@@ -92,7 +92,7 @@ const Foods = () => {
     )
   }
   return (
-    <>
+    <SafeAreaView style={styles.container}>
       <View style={styles.section_btns}>
           <Buttons
               title="Add"
@@ -171,13 +171,14 @@ const Foods = () => {
           </>
         ) : (renderFoodsList())
       }
-    </>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container:{
-    paddingTop: 15,
+    marginHorizontal:20,
+    flex:1
   },
   section_btns:{
     flexDirection:"row",

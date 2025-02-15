@@ -1,7 +1,7 @@
 import React from 'react'
 import { Image,Text, TouchableOpacity } from 'react-native'
 
-const Buttons =({pressHandler,title,stylesText,Icon,stylesButton}) => {
+const Buttons =({key,pressHandler,title,stylesText,Icon,stylesButton}) => {
   const RenderContentButton = () => {
     if(!Icon) {
             return <Text style={stylesText}>{title && title}</Text>
@@ -18,7 +18,7 @@ const Buttons =({pressHandler,title,stylesText,Icon,stylesButton}) => {
 
   }
   return (
-    <TouchableOpacity style={stylesButton} onPress={pressHandler}>
+    <TouchableOpacity key={key} style={stylesButton} onPress={pressHandler}>
         <RenderContentButton />
     </TouchableOpacity>
   )

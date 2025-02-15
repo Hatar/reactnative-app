@@ -13,8 +13,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/slices/authSlice';
 const Signin =() => {
 
-    const [email,setEmail] = useState({value:'amine.hatar@gmail.com',error:''})
-    const [password,setPassword] = useState({value:'20252025',error:''})
+    const [email,setEmail] = useState({value:'user@gmail.com',error:''})
+    const [password,setPassword] = useState({value:'123456',error:''})
     const navigation = useNavigation()
     const dispatch = useDispatch();
     const loading = useSelector((state) => state.auth.loading);

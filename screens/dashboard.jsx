@@ -9,7 +9,7 @@ const Dashboard =  () => {
   const [tabName,setTabName] = useState("categories")
   return (
     <SafeAreaView style={styles.container}>
-        <View style={styles.section_btns}>
+        {/* <View style={styles.section_btns}>
             <Buttons
                 title="Categories"
                 pressHandler={() =>setTabName("categories")}
@@ -25,7 +25,8 @@ const Dashboard =  () => {
         </View>
         {
           tabName === "categories" ? <Categories/> : <Foods/>
-        }
+        } */}
+        <View><Text>dashabord</Text></View>
     </SafeAreaView>
   )
 }

@@ -1,14 +1,14 @@
 import { PixelRatio } from "react-native";
-import biryani from '../assets/biryani.png'
-import chinese from '../assets/chinese.png'
-import desserts from '../assets/desserts.png'
 import pizza from '../assets/pizza.png'
-import sandwich from '../assets/sandwich.png'
 import logo from '../assets/logo.png'
 import cart from '../assets/cart.png'
 import deleteIcon from '../assets/dlt.png'
 import EditIcon from '../assets/editer.png'
 import AddIcon from '../assets/add.png'
+import mealIcon from '../assets/meal.png'
+import combosIcon from '../assets/combos.png'
+import settingsIcon from '../assets/settings.png'
+import SignOutIcon from '../assets/logout.png'
 
 import { Dimensions } from "react-native";
 const { width, height } = Dimensions.get("window");
@@ -49,15 +49,15 @@ export const FONTS = {
 
 
 export const ICONS = {
-    biryani,
-    chinese,
-    desserts,
     pizza,
-    sandwich,
     logo,
     cart,
     deleteIcon,
     EditIcon,
-    AddIcon
+    AddIcon,
+    mealIcon,
+    combosIcon,
+    settingsIcon,
+    SignOutIcon
 }
 

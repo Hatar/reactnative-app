@@ -1,3 +1,5 @@
+import { useSelector } from "react-redux";
+
 export function validationOtherFields(key,name) {
   if (!name.trim()) return key + " can't be empty.";
   return '';
@@ -27,5 +29,10 @@ export function validateConfirmPassword(password, confirmPassword) {
 export const capitalize = (string) => {
   const [firstLetter, ...restOfWord] = string;
   return firstLetter.toUpperCase() + restOfWord.join('')
+}
+
+
+export const isIncludeInCart = (dataStored,item) => {
+  return dataStored.some((el) => el.id === item.id)
 }
 

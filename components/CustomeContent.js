@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
 import Buttons from './Buttons'
 
-const CustomeContent = ({item,isLastItem,isEnableChangeContent,handleDelete,handleEditFood}) => {
+const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,handleDelete,handleEditFood}) => {
   const navigation = useNavigation()
   const {categories} = useSelector((state)=> state.categories)
   const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
@@ -36,7 +36,7 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,handleDelete,hand
             <View style={{margin:15,gap:10,justifyContent:'center'}}>
               {getNameOFCategory !== undefined ? <Text style={styles.article_title}>{getNameOFCategory}</Text> : ""}
               <Text style={styles.article_title}>{item.title}</Text>
-              <Text ellipsizeMode='tail' numberOfLines={1}  style={styles.article_title}>{item.author || item.description}</Text>
+              {isHome && <Text ellipsizeMode='tail' numberOfLines={1}  style={styles.article_title}>{item.author || item.description}</Text> }
               <Text style={styles.article_title}>{item.date || `${item.price}$`}</Text>
             </View>
         </View>

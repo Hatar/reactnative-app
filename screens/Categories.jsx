@@ -63,7 +63,7 @@ const Categories = () => {
     );
 
     return (
-        <>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Add New Category</Text>
 
             {/* Input and Button */}
@@ -112,11 +112,16 @@ const Categories = () => {
                     <Text>No Categories Right Now!!!</Text>
                 </View>
             )}
-        </>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    container:{
+        marginVertical: 30,
+        marginHorizontal:20,
+        flex:1
+    },
     inputWrapper: {
         flexDirection: "row",
         alignItems: "center",

@@ -4,18 +4,15 @@ import Header from '../components/Header'
 import { ICONS } from '../constants'
 import CartItems from '../components/CartItems'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
 
 const Checkout =() => {
   const navigation = useNavigation()
-  const orderList = [
-      { id: '1', title: 'MEALS', price: '$12.99', image: ICONS.biryani },
-      { id: '2', title: 'MEALS', price: '$9.99', image: ICONS.pizza },
-      { id: '1', title: 'COMBOS', price: '$12.99', image: ICONS.biryani },
-  ]
+  const {items} = useSelector((state)=>state.carts)
   return (
     <SafeAreaView style={styles.container}>
         <Header title={"Checkout"} isEnableIcon={false}/>
-        <CartItems orderList={orderList} navigation={navigation}/>
+        <CartItems orderList={items} navigation={navigation}/>
     </SafeAreaView>
   )
 }
