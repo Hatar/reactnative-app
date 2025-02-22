@@ -1,20 +1,27 @@
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import Buttons from "../components/Buttons";
 import TextInput from "../components/TextInput";
-import { COLORS, FONTS,SIZES } from "../constants";
+import { COLORS, FONTS,ICONS,SIZES } from "../constants";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import DropdownSelect from 'react-native-input-select';
-import { actAddFood, actDeleteFood, actEditFood, actGetFoods, toggleTabName } from "../redux/slices/food/foodSlice";
+import { actAddFood, actEditFood, actGetFoods, toggleTabName } from "../redux/slices/food/foodSlice";
 import CustomeContent from "../components/CustomeContent";
 import { FlatList } from "react-native-gesture-handler";
+import ModalWrapper from "../components/ModalWrapper"
+import Checkbox from 'expo-checkbox';
+import EmptyContent from "../components/CustomeContent";
 
 const Foods = () => {
-
+  const [isModalVisible,setModalVisible] = useState(false)
+  const [foodDeleted,setFoodDelete] = useState(null)
   const [title,setTitle] = useState("")
   const [price,setPrice] = useState("")
   const [description,setDescription] = useState("")
-  const [imageUrl,setImageUrl] = useState("https://www.cnet.com/a/img/resize/69256d2623afcbaa911f08edc45fb2d3f6a8e172/hub/2023/02/03/afedd3ee-671d-4189-bf39-4f312248fb27/gettyimages-1042132904.jpg?auto=webp&fit=crop&height=675&width=1200")
+  const [imageUrl,setImageUrl] = useState("")
+  
+  const [isChecked, setChecked] = useState(false);  
+  
   const [editFood,setEditFood] = useState(null)  
 
   const dispatch = useDispatch()
@@ -29,18 +36,22 @@ const Foods = () => {
     }
   },[dispatch,foods.length])
 
+
+  const switchToAddFood = () => {
+    dispatch(toggleTabName("add"))
+    clearForm()
+  }
+
   const handleAddFood = () => {
-    dispatch(actAddFood({categoryId:category,title,description,price,imageUrl}))
+    dispatch(actAddFood({categoryId:category,title,description,price,imageUrl,inStock:isChecked}))
     dispatch(toggleTabName("all"))
-    setCategory("")
-    setTitle("")
-    setPrice("")
-    setDescription("")
+    clearForm()
   }
 
 
-  const handleDeleteFood = (foodID) =>{
-    dispatch(actDeleteFood(foodID))
+  const handleDeleteFood = (item) =>{
+    setFoodDelete(item)
+    setModalVisible(true)
   }
 
 
@@ -50,6 +61,7 @@ const Foods = () => {
     setPrice(String(food.price))
     setDescription(food.description)
     setImageUrl(food.imageUrl)
+    setChecked(food.inStock)
     dispatch(toggleTabName("add"))
   } 
 
@@ -63,9 +75,15 @@ const Foods = () => {
       description,
       price,
       imageUrl,
+      inStock:isChecked
     }
     dispatch(actEditFood(updatedFood))
     dispatch(toggleTabName("all"))
+    clearForm()
+  }
+
+
+  const clearForm = () =>{
     setEditFood(null)
     setCategory("")
     setTitle("")
@@ -75,20 +93,26 @@ const Foods = () => {
 
   const renderFoodsList = () => {
     return (
-      <FlatList
-        data={foods}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => 
-          <CustomeContent
-            item={item}
-            isEnableChangeContent={true}
-            isLastItem={false}
-            handleDelete={() => handleDeleteFood(item.id)}
-            handleEditFood={()=> handleEditFood(item)}
+      <>
+      {
+        foods && foods.length > 0 ? (
+          <FlatList
+            data={foods}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => 
+              <CustomeContent
+                item={item}
+                isEnableChangeContent={true}
+                isLastItem={false}
+                handleDelete={() => handleDeleteFood(item)}
+                handleEditFood={()=> handleEditFood(item)}
+              />
+            }
+            showsVerticalScrollIndicator={false}
           />
-        }
-        showsVerticalScrollIndicator={false}
-      />
+        ) : <EmptyContent title={'Foods'} image={ICONS.NoFood} />
+      }
+      </>
     )
   }
   return (
@@ -96,7 +120,7 @@ const Foods = () => {
       <View style={styles.section_btns}>
           <Buttons
               title="Add"
-              pressHandler={() =>dispatch(toggleTabName("add"))}
+              pressHandler={() => switchToAddFood()}
               stylesText={styles.textButton}
               stylesButton={[styles.button,tabName === "add" && styles.activeButton,]}
           />
@@ -161,6 +185,16 @@ const Foods = () => {
                 customWrapperInput={styles.wrapperInput}
               />
 
+              <View style={styles.section_checkbox}>
+                <Checkbox
+                  style={styles.checkbox}
+                  color={COLORS.cardBg} 
+                  value={isChecked} 
+                  onValueChange={setChecked} 
+                /> 
+                <Text style={styles.paragraph}>{ isChecked ? "in Stock" : "out Stock" }</Text>
+              </View>
+
               <Buttons
                   title={editFood ? "Edit Food" :'Add Food'}
                   pressHandler={editFood ? handleSaveEdit :handleAddFood}
@@ -171,6 +205,14 @@ const Foods = () => {
           </>
         ) : (renderFoodsList())
       }
+
+    <ModalWrapper 
+          isModalVisible={isModalVisible}
+          disableModalConfirm={()=> setModalVisible(false)}
+          item={foodDeleted}
+          typeModal={"DELETE_FOOD"}
+          countItems={foods.length}
+      />
     </SafeAreaView>
   );
 };
@@ -184,7 +226,7 @@ const styles = StyleSheet.create({
     flexDirection:"row",
     justifyContent:"center",
     gap:10,
-    marginBottom:15
+    marginVertical:15
   },
   inputWrapper: {
     marginBottom: 10,
@@ -225,7 +267,6 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: COLORS.bg,
-    marginTop: SIZES.padding * 3,
     padding: SIZES.small + 4,
     alignItems: "center",
     borderRadius: SIZES.medium,
@@ -243,6 +284,18 @@ const styles = StyleSheet.create({
     marginHorizontal:0,
     marginBottom:15,
     borderRadius:0
+  },
+  section_checkbox:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap:5
+  },
+  paragraph: {
+    fontSize: 15,
+  },
+  checkbox: {
+    marginVertical: 15,
+    marginHorizontal:2
   }
 });
 

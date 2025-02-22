@@ -8,7 +8,7 @@ const CartIcon =() => {
   const navigation = useNavigation()
   const {items} = useSelector((state) => state.carts)
   return (
-    <TouchableOpacity style={styles.cart} onPress={() => navigation.navigate('Checkout')}>
+    <TouchableOpacity style={styles.cart} onPress={() => items.length >0 && navigation.navigate('Checkout')}>
          <Image
             source={ICONS.cart}
             resizeMode="contain"

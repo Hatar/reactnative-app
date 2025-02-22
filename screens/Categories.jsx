@@ -4,11 +4,14 @@ import TextInput from '../components/TextInput';
 import { COLORS, FONTS, ICONS, SIZES } from "../constants";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { actAddCategory, actGetCategories, actDeleteCategory, actEditCategory } from "../redux/slices/category/categorySlice";
-
+import { actAddCategory, actGetCategories, actEditCategory } from "../redux/slices/category/categorySlice";
+import ModalWrapper from "../components/ModalWrapper"
+import EmptyContent from "../components/EmptyContent";
 const Categories = () => {
+    const [isModalVisible,setModalVisible] = useState(false)
     const [category, setCategory] = useState("");
     const [editCategory,setEditCategory] = useState(null)
+    const [categoryDeleted,setCategoryDelete] = useState(null)
     const { loading, categories } = useSelector((state) => state.categories);
     const dispatch = useDispatch();
 
@@ -23,11 +26,12 @@ const Categories = () => {
           setEditCategory(null);
           setCategory("");
         }
-      };
+    };
 
-    const handleDeleteCategory = async (idCategory) => {
-        console.log("idCategory",idCategory)
-        await dispatch(actDeleteCategory(idCategory));
+
+    const handleDeleteCategory = (item)=>{
+        setCategoryDelete(item)
+        setModalVisible(true)
     }
 
     useEffect(() => {
@@ -54,7 +58,7 @@ const Categories = () => {
                 />
                 <Buttons
                     Icon={ICONS.deleteIcon}
-                    pressHandler={() => handleDeleteCategory(item.id)}
+                    pressHandler={() => handleDeleteCategory(item)}
                     stylesText={styles.textButton}
                     stylesButton={styles.button}
                 />
@@ -66,7 +70,6 @@ const Categories = () => {
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Add New Category</Text>
 
-            {/* Input and Button */}
             <View style={styles.inputWrapper}>
                 <TextInput
                     placeholder="Category name"
@@ -96,7 +99,6 @@ const Categories = () => {
                 
             </View>
 
-            {/* FlatList for Category List */}
             {loading === "loading" ? (
                 <ActivityIndicator size="large" color={COLORS.primary} />
             ) : categories.length > 0 ? (
@@ -107,11 +109,17 @@ const Categories = () => {
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ overflow: "auto" }}
                 />
-            ) : (
-                <View style={styles.noCategoriesContainer}>
-                    <Text>No Categories Right Now!!!</Text>
-                </View>
-            )}
+            ) : 
+                <EmptyContent title={"categories"} image={ICONS.NoFood} />
+            }
+
+            <ModalWrapper 
+                isModalVisible={isModalVisible}
+                disableModalConfirm={()=> setModalVisible(false)}
+                item={categoryDeleted}
+                typeModal={"DELETE_CATEGORY"}
+                countItems={categories.length}
+            />
         </SafeAreaView>
     );
 };

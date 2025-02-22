@@ -11,10 +11,12 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { FIREBASE_AUTH } from '../firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/slices/authSlice';
+
+
 const Signin =() => {
 
-    const [email,setEmail] = useState({value:'user@gmail.com',error:''})
-    const [password,setPassword] = useState({value:'123456',error:''})
+    const [email,setEmail] = useState({value:'amine.hatar@gmail.com',error:''})
+    const [password,setPassword] = useState({value:'20252025',error:''})
     const navigation = useNavigation()
     const dispatch = useDispatch();
     const loading = useSelector((state) => state.auth.loading);
@@ -136,9 +138,9 @@ export const styles = StyleSheet.create({
         fontSize: SIZES.large,
     },
     forgotPassword: {
-        width: '80%',
+        width: '100%',
         alignItems: 'flex-end',
-        marginBottom: 5,
+        marginVertical: 10,
     },
     row: {
         flexDirection: 'row',

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   FlatList,
   Image,
@@ -11,15 +11,18 @@ import {
 } from "react-native";
 import { COLORS, ICONS, SIZES } from "../constants";
 import Buttons from "./Buttons";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { decreaseQuantity, deleteItemFromCart, increaseQuantity } from "../redux/slices/cart/cartSlice";
-
-const CartItems = ({ orderList, navigation }) => {
-  const {total} = useSelector((state) =>state.carts)
+import { useNavigation } from '@react-navigation/native'
+import ModalWrapper from "./ModalWrapper.jsx"
+const CartItems = ({ orderList,total }) => {
+  const navigation = useNavigation()
   const dispatch = useDispatch();
-
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [food,setFood] = useState(null)
   const deleteItem = (item) =>{
-    dispatch(deleteItemFromCart(item))
+    setModalVisible(!isModalVisible);
+    setFood(item)
   }
 
   const increaseQty = useCallback((item) => {
@@ -44,8 +47,9 @@ const CartItems = ({ orderList, navigation }) => {
         <Text style={styles.price}>${item.price}</Text>
         <View style={styles.actionsContainer}>
           <Pressable
-            style={styles.qtyButton}
+            style={[styles.qtyButton, item.quantity <= 1 && styles.disabledButton]}
             onPress={() => decreaseQty(item)}
+            disabled={item.quantity <= 1}
           >
             <Text style={styles.qtyText}>-</Text>
           </Pressable>
@@ -63,6 +67,13 @@ const CartItems = ({ orderList, navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ModalWrapper 
+        isModalVisible={isModalVisible} 
+        disableModalConfirm={()=> setModalVisible(false)} 
+        item={food}
+        typeModal={"DELETE_ITEM_FROM_CART"}
+        countItems={orderList.length}
+      />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <FlatList
           data={orderList}
@@ -169,16 +180,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    height:100,
     backgroundColor: COLORS.white,
     paddingVertical: SIZES.padding * 2,
-    paddingHorizontal: SIZES.padding,
+    paddingHorizontal: SIZES.padding * 2,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
   },
   totalContainer: {
     flexDirection: "row",
@@ -208,6 +215,10 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: SIZES.medium,
     fontWeight: "bold",
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
+    opacity: 0.5
   },
 });
 

@@ -33,11 +33,37 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,handleDele
             }
             
             <Image source={{ uri: item.image || item.imageUrl }} style={styles.image_article}/>
-            <View style={{margin:15,gap:10,justifyContent:'center'}}>
-              {getNameOFCategory !== undefined ? <Text style={styles.article_title}>{getNameOFCategory}</Text> : ""}
-              <Text style={styles.article_title}>{item.title}</Text>
-              {isHome && <Text ellipsizeMode='tail' numberOfLines={1}  style={styles.article_title}>{item.author || item.description}</Text> }
-              <Text style={styles.article_title}>{item.date || `${item.price}$`}</Text>
+            
+            <View style={{flexDirection:"row",justifyContent:"space-between"}}>
+              <View style={{margin:15,gap:10}}>
+                {getNameOFCategory !== undefined ? 
+                  <Text style={styles.article_title}> 
+                  <Text style={styles.boldText}>Category: </Text>
+                    {getNameOFCategory}
+                  </Text> :
+                  ""
+                }
+                
+                <Text style={styles.article_title}>
+                  <Text style={styles.boldText}>title: </Text>
+                  {item.title}
+                </Text>
+                
+                {isHome && 
+                  <Text ellipsizeMode='tail' numberOfLines={1}  style={styles.article_title}>
+                    <Text style={styles.boldText}>Description: </Text>
+                    {item.author || item.description}
+                  </Text>
+                }
+                
+                <Text style={styles.article_title}>
+                  <Text style={styles.boldText}>{item.price  ? "Price:"  : "Date:"}: </Text>
+                  {item.date || `${item.price}$`}
+                </Text>
+              </View>
+              <View style={{margin:15,gap:10}}>
+                <Text style={styles.boldText}>{ item.inStock ? "in Stock" : "Out of Stock" }</Text>
+              </View>
             </View>
         </View>
       )
@@ -150,6 +176,11 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: SIZES.medium,
   },
+  boldText:{
+    fontWeight:600,
+    fontSize:15,
+    color:COLORS.second
+  }
 
 })
 
