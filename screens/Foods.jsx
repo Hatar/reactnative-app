@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView,Image,TouchableOpacity, StyleSheet, Text, View, Alert } from "react-native";
 import Buttons from "../components/Buttons";
 import TextInput from "../components/TextInput";
 import { COLORS, FONTS,ICONS,SIZES } from "../constants";
@@ -11,6 +11,7 @@ import { FlatList } from "react-native-gesture-handler";
 import ModalWrapper from "../components/ModalWrapper"
 import Checkbox from 'expo-checkbox';
 import EmptyContent from "../components/CustomeContent";
+import * as ImagePicker from 'expo-image-picker'
 
 const Foods = () => {
   const [isModalVisible,setModalVisible] = useState(false)
@@ -18,7 +19,8 @@ const Foods = () => {
   const [title,setTitle] = useState("")
   const [price,setPrice] = useState("")
   const [description,setDescription] = useState("")
-  const [imageUrl,setImageUrl] = useState("")
+  const [image,setImage] = useState(null)
+
   
   const [isChecked, setChecked] = useState(false);  
   
@@ -42,12 +44,6 @@ const Foods = () => {
     clearForm()
   }
 
-  const handleAddFood = () => {
-    dispatch(actAddFood({categoryId:category,title,description,price,imageUrl,inStock:isChecked}))
-    dispatch(toggleTabName("all"))
-    clearForm()
-  }
-
 
   const handleDeleteFood = (item) =>{
     setFoodDelete(item)
@@ -60,8 +56,9 @@ const Foods = () => {
     setTitle(food.title)
     setPrice(String(food.price))
     setDescription(food.description)
-    setImageUrl(food.imageUrl)
+    setImage(food.imageUrl)
     setChecked(food.inStock)
+    setImage(food.imageUrl)
     dispatch(toggleTabName("add"))
   } 
 
@@ -74,12 +71,32 @@ const Foods = () => {
       title,
       description,
       price,
-      imageUrl,
+      imageUrl:image,
       inStock:isChecked
     }
     dispatch(actEditFood(updatedFood))
     dispatch(toggleTabName("all"))
     clearForm()
+  }
+
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4,3],
+        quality: 1
+    });
+    setImage(result.assets[0].uri)
+  };
+
+  const handleAddFood = async () => {
+    console.log("imageUrl",image)
+    dispatch(
+      actAddFood({ categoryId: category, title, description, price, imageUrl:image, inStock: isChecked })
+    )
+    dispatch(toggleTabName("all"))
+    clearForm();
   }
 
 
@@ -89,7 +106,10 @@ const Foods = () => {
     setTitle("")
     setPrice("")
     setDescription("")
+    setImage(null)
   }
+
+
 
   const renderFoodsList = () => {
     return (
@@ -174,17 +194,7 @@ const Foods = () => {
                 customInput={styles.input}
                 customWrapperInput={styles.wrapperInput}
               />
-    
-              <TextInput
-                placeholder="Image"
-                value={imageUrl}
-                autoCapitalize="none"
-                returnKeyType="next"
-                onChangeText={(text) => setImageUrl(text)}
-                customInput={styles.input}
-                customWrapperInput={styles.wrapperInput}
-              />
-
+  
               <View style={styles.section_checkbox}>
                 <Checkbox
                   style={styles.checkbox}
@@ -194,7 +204,18 @@ const Foods = () => {
                 /> 
                 <Text style={styles.paragraph}>{ isChecked ? "in Stock" : "out Stock" }</Text>
               </View>
-
+              
+              <View style={{marginVertical:10,flexDirection:"column",gap:10}}>
+                <Buttons
+                    title={"Pick an Image"}
+                    pressHandler={pickImage}
+                    stylesText={styles.textButton}
+                    stylesButton={styles.button}
+                />
+                {image && <Image source={{ uri: image }} style={{ width: 100, height: 100 }} />}
+              </View>
+              
+          
               <Buttons
                   title={editFood ? "Edit Food" :'Add Food'}
                   pressHandler={editFood ? handleSaveEdit :handleAddFood}
