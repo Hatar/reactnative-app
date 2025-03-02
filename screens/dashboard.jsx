@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 const Dashboard =  () => {  
   return (
     <SafeAreaView style={styles.container}>
-        <View><Text>dashabord</Text></View>
+        <View><Text className="text-red-500">dashabord</Text></View>
     </SafeAreaView>
   )
 }
