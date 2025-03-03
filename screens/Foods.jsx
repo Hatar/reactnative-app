@@ -124,6 +124,7 @@ const Foods = () => {
                 item={item}
                 isEnableChangeContent={true}
                 isLastItem={false}
+                isArticle={false}
                 handleDelete={() => handleDeleteFood(item)}
                 handleEditFood={()=> handleEditFood(item)}
               />

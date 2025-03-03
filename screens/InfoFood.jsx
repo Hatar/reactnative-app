@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import { COLORS, FONTS, SIZES } from '../constants'
 import Buttons from '../components/Buttons'
 import star from '../assets/star.png'
@@ -13,6 +13,9 @@ const InfoFood =  ({route}) => {
   const {item} = route.params
   const {items} = useSelector((state)=>state.carts)
   const dispatch = useDispatch();
+
+  const {width} = useWindowDimensions()
+
   const addToCart = () => {
     if(!isIncludeInCart(items,item)) {
         dispatch(addItemToCart(item))
@@ -22,7 +25,7 @@ const InfoFood =  ({route}) => {
   const renderFoodInformation = () => {
     const marginTop = Platform.OS === "ios" ? 10 : 20
     const marginBottom = Platform.OS === "ios" ? 10 : 10
-    const height = Platform.OS === "ios" ? 450 : 470
+    const height = Platform.OS === "ios" ? width === 576  ? 350 : 450 : width === 576  ? 400 : 470
 
     return (
         <>
@@ -70,7 +73,7 @@ const InfoFood =  ({route}) => {
             </View>
 
             {/* Add to Cart Button */}
-            <View style={{ margin: 10 * 2, marginTop: Platform.OS === "ios" ? 0: 35 }}>
+            <View style={{ margin: 10 * 2, marginTop: Platform.OS === "ios" ? 0: width === 576  ? -15 : 35 }}>
                 <Buttons
                     title="Add to Cart"
                     pressHandler={() =>addToCart()}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View, FlatList, Image, TouchableOpacity, useWindowDimensions } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { actGetCategories } from "../redux/slices/category/categorySlice";
 import Buttons from "../components/Buttons";
@@ -21,8 +21,10 @@ function Home() {
   const [filterFoods,setFilterFoods] = useState([])
   const [activeCategory, setActiveCategory] = useState(null);
 
-
   const dispatch = useDispatch();
+
+  const {width} = useWindowDimensions()
+
 
   useEffect(() => {
     dispatch(actGetCategories());
@@ -114,7 +116,7 @@ function Home() {
                           </View>
                         </TouchableOpacity>
                       )}
-                      numColumns={2}
+                      numColumns={width === 576 ? 3 : 2}
                       columnWrapperStyle={styles.row}
                       showsVerticalScrollIndicator={false}
                     />
