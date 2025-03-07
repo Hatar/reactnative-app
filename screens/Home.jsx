@@ -59,7 +59,7 @@ function Home() {
     <SafeAreaView style={styles.container}>
       {role !== "admin" ? (
         <>
-          {categories.length && <Text style={styles.title}>Categories</Text> } 
+          {categories.length > 0 && <Text style={styles.title}>Categories</Text> } 
           <View>
             <FlatList
               data={categories}
@@ -77,7 +77,7 @@ function Home() {
               contentContainerStyle={styles.categoryContainer}
             />
           </View>
-          {filterFoods.length && <Text style={styles.title}>Foods</Text>}
+          {filterFoods.length > 0 && <Text style={styles.title}>Foods</Text>}
           <View style={{flex:1}}>
               {
                 filterFoods && filterFoods.length > 0 ? 

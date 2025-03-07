@@ -13,7 +13,9 @@ const request = async (endpoint, method = 'GET', body = null, headers = {}) => {
 
     const data = await response.json()
     if (!response.ok) {
-      throw data.errors[0].message || "Something Wrong !!"
+      throw  (data.errors instanceof Array && data.errors.length > 0 && data.errors[0].message) ||
+      data.message ||
+      "Something Wrong !!";
     }
     return data
   } catch (error) {

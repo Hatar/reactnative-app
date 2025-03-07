@@ -28,8 +28,10 @@ const Signin =() => {
             setPassword({ ...password, error: passwordError })
             return
         } 
-        await dispatch(actSignIn({email:email.value,password:password.value}))
-        await navigation.navigate('Home');
+        const response =await dispatch(actSignIn({email:email.value,password:password.value}))
+        if(response?.payload !=="Mot de passe incorrect.") {
+            await navigation.navigate('Home');
+        }
     }
 
     useEffect(() =>{
