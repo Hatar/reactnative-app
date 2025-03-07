@@ -41,8 +41,8 @@ const Navigation = () => {
 
 
   const CustomDrawerContent = ({ navigation }) => {
-    const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated)
-    const filteredMenuItems = isAdmin
+    const role = useSelector((state) => state.auth.role)
+    const filteredMenuItems = role ==="admin"
       ? menuItems
       : menuItems.filter(item => item.label !== "Categories" && item.label !== "Foods");
     const userMenuItems = [
@@ -84,7 +84,7 @@ const Navigation = () => {
     const uniqueMenuItems = Array.from(
       new Map(menuItems.map((item) => [item.label, item])).values()
     );
-    const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
+    const role = useSelector((state) => state.auth.role);
     const getComponentForMenu = (label) => {
       switch (label) {
         case "Foods":
@@ -107,7 +107,7 @@ const Navigation = () => {
             width: 300,
           },
           headerRight: () => 
-            !isAdmin ? (
+            role !=="admin" ? (
               <TouchableOpacity
                 onPress={() => {
                   console.log("Right icon pressed");

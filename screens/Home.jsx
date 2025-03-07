@@ -16,7 +16,7 @@ function Home() {
   const { categories } = useSelector((state) => state.categories);
   const { foods } = useSelector((state) => state.foods);
   const { items } = useSelector((state) => state.carts);
-  const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
+  const role = useSelector((state) => state.auth.role);
 
   const [filterFoods,setFilterFoods] = useState([])
   const [activeCategory, setActiveCategory] = useState(null);
@@ -57,7 +57,7 @@ function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {!isAdmin ? (
+      {role !== "admin" ? (
         <>
           <Text style={styles.title}>Categories</Text>
           <View>

@@ -9,8 +9,9 @@ import { useNavigation } from '@react-navigation/native';
 import BackButton from '../components/BackButton';
 import { validateConfirmPassword, validationOtherFields, validationPassword, validationEmail } from '../helpers';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../firebase';
+import Checkbox from 'expo-checkbox';
+import { useDispatch, useSelector } from 'react-redux';
+import { actSignUp } from '../redux/slices/auth/act/actSignUp';
 
 const Signup = () => {
     const navigation = useNavigation();
@@ -20,7 +21,11 @@ const Signup = () => {
     const [email, setEmail] = useState({ value: '', error: '' });
     const [password, setPassword] = useState({ value: '', error: '' });
     const [confirmPassword, setConfirmPassword] = useState({ value: '', error: '' });
-    const [loading, setLoading] = useState(false);
+    const [gender,setGender] = useState("Male")
+
+
+    const dispatch = useDispatch();
+    const {error,loading} = useSelector((state)=>state.auth)
 
     // Handlers
     const onSignUpPressed = async () => {
@@ -58,22 +63,11 @@ const Signup = () => {
             setConfirmPassword((prev) => ({ ...prev, error: confirmPasswordError }));
             isValid = false;
         }
-    
+        console.log("isValid",isValid)
         // If all validations pass, proceed with Firebase authentication
         if (isValid) {
-            setLoading(true);
-    
-            try {
-                console.log('Attempting to create user...');
-                
-                // Create a new user with email and password
-                const response = await createUserWithEmailAndPassword(FIREBASE_AUTH, email.value, password.value);
-                if (response) navigation.navigate("Signin");
-            } catch (error) {
-                console.error('Error during signup:', error.message);
-            } finally {
-                setLoading(false);
-            }
+            await dispatch(actSignUp({email:email.value, password:password.value,firstName: firstname.value,firstName: lastname.value,gender}))
+            await navigation.navigate("Signin");
         }
     };
 
@@ -88,6 +82,9 @@ const Signup = () => {
             <Text style={styles.title}>Create Your Account</Text>
             <Text style={styles.subtitle}>Join us and start exploring today!</Text>
             
+
+            <Text className="text-xl font-medium text-red-600 my-2">{error}</Text>
+
             <TextInput 
                 placeholder={'Enter First Name'}
                 value={firstname.value}
@@ -119,7 +116,6 @@ const Signup = () => {
                 value={password.value}
                 errortext={password.error}
                 secureTextEntry
-                returnKeyType="done"
                 onChangeText={(text) => setPassword({ value: text, error: '' })}
             />
             <TextInput 
@@ -127,9 +123,30 @@ const Signup = () => {
                 value={confirmPassword.value}
                 errortext={confirmPassword.error}
                 secureTextEntry
-                returnKeyType="done"
                 onChangeText={(text) => setConfirmPassword({ value: text, error: '' })}
             />
+
+            <View style={{flexDirection:"row",justifyContent:"flex-start",gap:10}}>
+                <View style={styles.section_checkbox}>
+                    <Checkbox
+                        style={styles.checkbox}
+                        color={COLORS.cardBg} 
+                        value={gender === "Male"} 
+                        onValueChange={()=> setGender("Male")} 
+                    /> 
+                    <Text style={styles.paragraph}>Male</Text>
+                </View>
+                <View style={styles.section_checkbox}>
+                    <Checkbox
+                        style={styles.checkbox}
+                        color={COLORS.cardBg} 
+                        value={gender === "Famale"} 
+                        onValueChange={()=> setGender("Famale")} 
+                    /> 
+                    <Text style={styles.paragraph}>Famale</Text>
+                </View>
+
+            </View>
             {loading ? <ActivityIndicator size="large" color={COLORS.bg} /> : 
                 <Buttons
                     title="Sign Up"
@@ -204,6 +221,19 @@ const styles = StyleSheet.create({
         top: 50 + getStatusBarHeight(),
         left: 4,
     },
+    section_checkbox:{
+        flexDirection: 'row',
+        justifyContent:"flex-start",
+        alignItems: 'center',
+        gap:5
+    },
+    paragraph: {
+        fontSize: 15,
+    },
+    checkbox: {
+        marginVertical: 15,
+        marginHorizontal:2
+    }
 });
 
 export default Signup;

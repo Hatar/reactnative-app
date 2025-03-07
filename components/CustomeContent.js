@@ -8,7 +8,7 @@ import Buttons from './Buttons'
 const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,handleDelete,handleEditFood}) => {
   const navigation = useNavigation()
   const {categories} = useSelector((state)=> state.categories)
-  const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
+  const role = useSelector((state) => state.auth.role);
   const getNameOFCategory = categories.find((category) => category.id === item.categoryId)?.name
 
 
@@ -16,7 +16,7 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
       return (
         <View>
             {
-              isAdmin && !isArticle && (
+              role ==="admin" && !isArticle && (
                 <View style={styles.actionsBtn}>
                   <Buttons
                       Icon={ICONS.EditIcon}
