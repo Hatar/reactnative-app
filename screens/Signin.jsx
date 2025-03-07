@@ -1,4 +1,4 @@
-import React, {  useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Background from '../components/Background'
 import { COLORS, FONTS, SIZES } from '../constants';
@@ -17,7 +17,7 @@ const Signin =() => {
     const [password,setPassword] = useState({value:'Test134@#',error:''})
     const navigation = useNavigation()
     const dispatch = useDispatch();
-    const {loading,error} = useSelector((state) => state.auth);
+    const {loading,error,user} = useSelector((state) => state.auth);
 
     // Handlers
    const onPress = async () => {
@@ -28,10 +28,16 @@ const Signin =() => {
             setPassword({ ...password, error: passwordError })
             return
         } 
-        console.log(email.value,password.value)
         await dispatch(actSignIn({email:email.value,password:password.value}))
         await navigation.navigate('Home');
     }
+
+    useEffect(() =>{
+        if(user !== null) {
+            setEmail({ value: user.email, error: '' })
+            setPassword({ value: user.password, error: '' })
+        }
+    },[user])
     return (
         <Background>
             <View style={styles.imageContainer}

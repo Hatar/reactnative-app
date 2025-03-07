@@ -10,13 +10,13 @@ const request = async (endpoint, method = 'GET', body = null, headers = {}) => {
       body: body ? JSON.stringify(body) : null,
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP Error! Status: ${response.status}`);
-    }
 
-    return await response.json();
+    const data = await response.json()
+    if (!response.ok) {
+      throw data.errors[0].message || "Something Wrong !!"
+    }
+    return data
   } catch (error) {
-    console.error('API Request Error:', error);
     throw error;
   }
 };

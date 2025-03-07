@@ -26,7 +26,6 @@ const Signup = () => {
 
     const dispatch = useDispatch();
     const {error,loading} = useSelector((state)=>state.auth)
-
     // Handlers
     const onSignUpPressed = async () => {
         let isValid = true;
@@ -63,11 +62,20 @@ const Signup = () => {
             setConfirmPassword((prev) => ({ ...prev, error: confirmPasswordError }));
             isValid = false;
         }
-        console.log("isValid",isValid)
         // If all validations pass, proceed with Firebase authentication
         if (isValid) {
-            await dispatch(actSignUp({email:email.value, password:password.value,firstName: firstname.value,firstName: lastname.value,gender}))
-            await navigation.navigate("Signin");
+            const response = await dispatch(actSignUp({
+                email:email.value,
+                password:password.value,
+                confirmPassword:confirmPassword.value,
+                firstName: firstname.value,
+                lastName: lastname.value,
+                gender
+            }))
+            if(response?.payload?.message === "user ajouté avec succès") {
+                await navigation.navigate("Signin");
+            }
+            
         }
     };
 
@@ -82,8 +90,7 @@ const Signup = () => {
             <Text style={styles.title}>Create Your Account</Text>
             <Text style={styles.subtitle}>Join us and start exploring today!</Text>
             
-
-            <Text className="text-xl font-medium text-red-600 my-2">{error}</Text>
+            <Text className="text-xl font-medium text-red-600 mt-1 mb-2">{error}</Text>
 
             <TextInput 
                 placeholder={'Enter First Name'}
@@ -116,6 +123,7 @@ const Signup = () => {
                 value={password.value}
                 errortext={password.error}
                 secureTextEntry
+                textContentType="oneTimeCode"
                 onChangeText={(text) => setPassword({ value: text, error: '' })}
             />
             <TextInput 
@@ -123,6 +131,7 @@ const Signup = () => {
                 value={confirmPassword.value}
                 errortext={confirmPassword.error}
                 secureTextEntry
+                textContentType="oneTimeCode"
                 onChangeText={(text) => setConfirmPassword({ value: text, error: '' })}
             />
 
@@ -193,7 +202,6 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.regular,
         color: COLORS.cardBg,
         textAlign: 'center',
-        marginBottom: 20,
     },
     button: {
         backgroundColor: COLORS.second,

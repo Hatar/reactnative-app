@@ -39,7 +39,6 @@ const Categories = () => {
     }, [dispatch]);
 
     const handleAddCategory = useCallback(async () => {
-        console.log("adding",category)
         if (category.trim() && category!=="") {
             await dispatch(actAddCategory({ name: category }));
             setCategory("");

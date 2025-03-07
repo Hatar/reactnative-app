@@ -29,7 +29,6 @@ const authSlice = createSlice({
 
     // signIn
     builder.addCase(actSignIn.pending,(state)=>{
-      console.log("pending")
       state.loading=true
     }),
     builder.addCase(actSignIn.fulfilled,(state,action) =>{
@@ -49,7 +48,9 @@ const authSlice = createSlice({
       state.loading = true
     })
     builder.addCase(actSignUp.fulfilled,(state,action) =>{
+      state.user = action?.meta?.arg
       state.loading=false
+      state.error =null
     })
     builder.addCase(actSignUp.rejected,(state,action) =>{
       state.error = action.payload
