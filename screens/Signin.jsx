@@ -1,4 +1,4 @@
-import React, {  useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Background from '../components/Background'
 import { COLORS, FONTS, SIZES } from '../constants';
@@ -7,20 +7,17 @@ import TextInput from '../components/TextInput';
 import Buttons from '../components/Buttons';
 import { useNavigation } from '@react-navigation/native';
 import { validationEmail,validationPassword } from '../helpers';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../firebase';
 import { useDispatch, useSelector } from 'react-redux';
-import { signInFailure, signInStart, signInSuccess } from '../redux/slices/authSlice';
+import { actSignIn } from '../redux/slices/auth/authSlice';
 
 
 const Signin =() => {
 
-    const [email,setEmail] = useState({value:'amine.hatar@gmail.com',error:''})
-    const [password,setPassword] = useState({value:'20252025',error:''})
+    const [email,setEmail] = useState({value:'amine@gmail.com',error:''})
+    const [password,setPassword] = useState({value:'Test134@#',error:''})
     const navigation = useNavigation()
     const dispatch = useDispatch();
-    const loading = useSelector((state) => state.auth.loading);
-
+    const {loading,error,user} = useSelector((state) => state.auth);
 
     // Handlers
    const onPress = async () => {
@@ -31,23 +28,16 @@ const Signin =() => {
             setPassword({ ...password, error: passwordError })
             return
         } 
-        dispatch(signInStart())
-        try {
-            const response = await signInWithEmailAndPassword(FIREBASE_AUTH,email.value,password.value)
-            if(response) {
-                const userData ={
-                    email: response.user.email,
-                    role: email.value === "amine.hatar@gmail.com" ? "admin" : "user"
-                }
-                dispatch(signInSuccess(userData))
-                navigation.navigate('Home');
-            }
-        } catch (error) {
-            dispatch(signInFailure(error.message));
-            console.log('Error:', error.message);
-        }
-        
+        await dispatch(actSignIn({email:email.value,password:password.value}))
+        await navigation.navigate('Home');
     }
+
+    useEffect(() =>{
+        if(user !== null) {
+            setEmail({ value: user.email, error: '' })
+            setPassword({ value: user.password, error: '' })
+        }
+    },[user])
     return (
         <Background>
             <View style={styles.imageContainer}
@@ -56,6 +46,8 @@ const Signin =() => {
                     <Image style={styles.image} source={logo}/>
                 </View>
             </View>
+
+            <Text className="text-xl font-medium text-red-600 my-2">{error}</Text>
         
             <TextInput 
                 placeholder={'Enter Your Email'}

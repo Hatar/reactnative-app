@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
 import Buttons from './Buttons'
 
-const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,handleDelete,handleEditFood}) => {
+const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,handleDelete,handleEditFood}) => {
   const navigation = useNavigation()
   const {categories} = useSelector((state)=> state.categories)
-  const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
+  const role = useSelector((state) => state.auth.role);
   const getNameOFCategory = categories.find((category) => category.id === item.categoryId)?.name
 
 
@@ -16,7 +16,7 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,handleDele
       return (
         <View>
             {
-              isAdmin && (
+              role ==="admin" && !isArticle && (
                 <View style={styles.actionsBtn}>
                   <Buttons
                       Icon={ICONS.EditIcon}
@@ -61,9 +61,11 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,handleDele
                   {item.date || `${item.price}$`}
                 </Text>
               </View>
-              <View style={{margin:15,gap:10}}>
-                <Text style={styles.boldText}>{ item.inStock ? "in Stock" : "Out of Stock" }</Text>
-              </View>
+              {!isArticle && 
+                <View style={{margin:15,gap:10}}>
+                  <Text style={styles.boldText}>{ item.inStock ? "in Stock" : "Out of Stock" }</Text>
+                </View>
+              }
             </View>
         </View>
       )
@@ -80,10 +82,8 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,handleDele
 
   return (
       <TouchableOpacity style={[styles.itemContainer,isEnableChangeContent && styles.overideBackground,isLastItem && styles.lastItem]} onPress={() => {
-            if(!isEnableChangeContent) {
-              navigation.navigate('InfoFood',{
-                  item:item
-              })
+            if(!isArticle) {
+              navigation.navigate('InfoFood',{item})
             }
           }}>
           {!isEnableChangeContent &&

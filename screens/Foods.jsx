@@ -91,7 +91,6 @@ const Foods = () => {
   };
 
   const handleAddFood = async () => {
-    console.log("imageUrl",image)
     dispatch(
       actAddFood({ categoryId: category, title, description, price, imageUrl:image, inStock: isChecked })
     )
@@ -124,6 +123,7 @@ const Foods = () => {
                 item={item}
                 isEnableChangeContent={true}
                 isLastItem={false}
+                isArticle={false}
                 handleDelete={() => handleDeleteFood(item)}
                 handleEditFood={()=> handleEditFood(item)}
               />

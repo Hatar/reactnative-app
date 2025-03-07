@@ -122,6 +122,7 @@ const AboutUs =() => {
                 item={item}
                 isEnableChangeContent={true}
                 isLastItem={false}
+                isArticle={true}
               />
             }
             showsVerticalScrollIndicator={false}

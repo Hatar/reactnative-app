@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View, FlatList, Image, TouchableOpacity, useWindowDimensions } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { actGetCategories } from "../redux/slices/category/categorySlice";
 import Buttons from "../components/Buttons";
@@ -16,13 +16,15 @@ function Home() {
   const { categories } = useSelector((state) => state.categories);
   const { foods } = useSelector((state) => state.foods);
   const { items } = useSelector((state) => state.carts);
-  const isAdmin = useSelector((state) => state.auth.isAdminAuthenticated);
+  const role = useSelector((state) => state.auth.role);
 
   const [filterFoods,setFilterFoods] = useState([])
   const [activeCategory, setActiveCategory] = useState(null);
 
-
   const dispatch = useDispatch();
+
+  const {width} = useWindowDimensions()
+
 
   useEffect(() => {
     dispatch(actGetCategories());
@@ -55,9 +57,9 @@ function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {!isAdmin ? (
+      {role !== "admin" ? (
         <>
-          <Text style={styles.title}>Categories</Text>
+          {categories.length && <Text style={styles.title}>Categories</Text> } 
           <View>
             <FlatList
               data={categories}
@@ -75,7 +77,7 @@ function Home() {
               contentContainerStyle={styles.categoryContainer}
             />
           </View>
-          <Text style={styles.title}>Foods</Text>
+          {filterFoods.length && <Text style={styles.title}>Foods</Text>}
           <View style={{flex:1}}>
               {
                 filterFoods && filterFoods.length > 0 ? 
@@ -114,7 +116,7 @@ function Home() {
                           </View>
                         </TouchableOpacity>
                       )}
-                      numColumns={2}
+                      numColumns={width === 576 ? 3 : 2}
                       columnWrapperStyle={styles.row}
                       showsVerticalScrollIndicator={false}
                     />

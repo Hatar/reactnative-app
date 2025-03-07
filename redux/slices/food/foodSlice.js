@@ -48,7 +48,6 @@ const foodSlice = createSlice({
             state.errror=null
         }),
         builder.addCase(actAddFood.fulfilled, (state, action) => {
-            console.log("action add food",action.payload)
             state.loading = "succeeded";
             const foodExists = state.foods.some((food) => food.id === action.payload.id)
             if (!foodExists) {

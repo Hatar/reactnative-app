@@ -8,11 +8,12 @@ import {
   View,
   SafeAreaView,
   ScrollView,
+  useWindowDimensions,
 } from "react-native";
 import { COLORS, ICONS, SIZES } from "../constants";
 import Buttons from "./Buttons";
 import { useDispatch } from "react-redux";
-import { decreaseQuantity, deleteItemFromCart, increaseQuantity } from "../redux/slices/cart/cartSlice";
+import { decreaseQuantity, increaseQuantity } from "../redux/slices/cart/cartSlice";
 import { useNavigation } from '@react-navigation/native'
 import ModalWrapper from "./ModalWrapper.jsx"
 const CartItems = ({ orderList,total }) => {
@@ -20,6 +21,11 @@ const CartItems = ({ orderList,total }) => {
   const dispatch = useDispatch();
   const [isModalVisible, setModalVisible] = useState(false);
   const [food,setFood] = useState(null)
+
+  const {width} = useWindowDimensions()
+
+  const styles = getStyles(width)
+
   const deleteItem = (item) =>{
     setModalVisible(!isModalVisible);
     setFood(item)
@@ -98,7 +104,7 @@ const CartItems = ({ orderList,total }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (width) => StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 15,
@@ -180,7 +186,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height:100,
+    height: width === 576 ? 130 : 100,
     backgroundColor: COLORS.white,
     paddingVertical: SIZES.padding * 2,
     paddingHorizontal: SIZES.padding * 2,
