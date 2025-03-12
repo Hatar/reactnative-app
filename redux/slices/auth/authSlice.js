@@ -23,6 +23,11 @@ const authSlice = createSlice({
     },
     setUserInfo:(state) =>{
       state.user=state
+    },
+    clearStateAuth:(state) =>{
+      state.user=null,
+      state.error=null,
+      state.role=null
     }
   },
   extraReducers: (builder) =>{
@@ -33,6 +38,7 @@ const authSlice = createSlice({
     }),
     builder.addCase(actSignIn.fulfilled,(state,action) =>{
       state.token= action.payload.token
+      console.log("check rolle",jwtDecode(action.payload.token))
       state.role = action.payload ? jwtDecode(action.payload.token).role :null
       state.error = null
       state.loading=false
@@ -60,4 +66,6 @@ const authSlice = createSlice({
 });
 
 export {actSignIn,actSignUp}
+export const {clearStateAuth} = authSlice.actions
+
 export default authSlice.reducer;

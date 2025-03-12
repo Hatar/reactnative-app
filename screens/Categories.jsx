@@ -132,8 +132,9 @@ const styles = StyleSheet.create({
     inputWrapper: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
+        gap: 10,
         marginBottom: 20,
+        width: "85%"
     },
     categoryWrapper: {
         flexDirection: "row",

@@ -9,7 +9,7 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
   const navigation = useNavigation()
   const {categories} = useSelector((state)=> state.categories)
   const role = useSelector((state) => state.auth.role);
-  const getNameOFCategory = categories.find((category) => category.id === item.categoryId)?.name
+  const getNameOFCategory = categories.find((category) => category.id === item?.categoryId)?.name
 
 
   const renderContentArticle = () => {
@@ -32,7 +32,7 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
               )
             }
             
-            <Image source={{ uri: item.image || item.imageUrl }} style={styles.image_article}/>
+            <Image source={{ uri: item?.image || item?.imageUrl }} style={styles.image_article}/>
             
             <View style={{flexDirection:"row",justifyContent:"space-between"}}>
               <View style={{margin:15,gap:10}}>
@@ -46,24 +46,24 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
                 
                 <Text style={styles.article_title}>
                   <Text style={styles.boldText}>title: </Text>
-                  {item.title}
+                  {item?.title}
                 </Text>
                 
                 {isHome && 
                   <Text ellipsizeMode='tail' numberOfLines={1}  style={styles.article_title}>
                     <Text style={styles.boldText}>Description: </Text>
-                    {item.author || item.description}
+                    {item?.author || item?.description}
                   </Text>
                 }
                 
                 <Text style={styles.article_title}>
-                  <Text style={styles.boldText}>{item.price  ? "Price:"  : "Date:"}: </Text>
-                  {item.date || `${item.price}$`}
+                  <Text style={styles.boldText}>{item?.price  ? "Price:"  : "Date:"}: </Text>
+                  {item?.date || `${item?.price}$`}
                 </Text>
               </View>
               {!isArticle && 
                 <View style={{margin:15,gap:10}}>
-                  <Text style={styles.boldText}>{ item.inStock ? "in Stock" : "Out of Stock" }</Text>
+                  <Text style={styles.boldText}>{ item?.inStock ? "in Stock" : "Out of Stock" }</Text>
                 </View>
               }
             </View>
@@ -74,8 +74,8 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
   const renderContentItemFood = () => {
     return (
       <View style={styles.infoSection}>
-        <Text ellipsizeMode='tail' numberOfLines={1} style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemPrice}>{item.price}$</Text>
+        <Text ellipsizeMode='tail' numberOfLines={1} style={styles.itemTitle}>{item?.title}</Text>
+        <Text style={styles.itemPrice}>{item?.price}$</Text>
       </View>
     )
   }
@@ -87,7 +87,7 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
             }
           }}>
           {!isEnableChangeContent &&
-            <Image source={{uri:item.imageUrl}} style={!isEnableChangeContent ? styles.itemImage: styles.image_article} resizeMode="cover" />
+            <Image source={{uri:item?.imageUrl}} style={!isEnableChangeContent ? styles.itemImage: styles.image_article} resizeMode="cover" />
           }
           {!isEnableChangeContent ? renderContentItemFood () : renderContentArticle()  }
       </TouchableOpacity>

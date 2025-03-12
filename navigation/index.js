@@ -19,10 +19,20 @@ import aboutIcon from "../assets/information-button.png";
 import { useSelector } from "react-redux";
 import Categories from "../screens/Categories";
 import Foods from "../screens/Foods";
+import Profile from "../screens/Profile";
 
 const Navigation = () => {
   const menuItems = [
-    { label: "Home", navigateTo: "Home", icon: ICONS.logo },
+    { 
+      label: "Home",
+      navigateTo: "Home",
+      icon: ICONS.logo
+    },
+    {
+      label: "Profile",
+      navigateTo: "Profile",
+      icon: ICONS.profileIcon,
+    },
     {
       label: "Categories",
       navigateTo: "Categories",
@@ -87,6 +97,8 @@ const Navigation = () => {
     const role = useSelector((state) => state.auth.role);
     const getComponentForMenu = (label) => {
       switch (label) {
+        case "Profile":
+          return Profile
         case "Foods":
           return Foods
         case "Categories":
@@ -155,6 +167,7 @@ const Navigation = () => {
         <Stack.Screen name="Categories" component={Categories} />
         <Stack.Screen name="Foods" component={Foods} />
         <Stack.Screen name="Signup" component={Signup} />
+        <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen
           name="ResetPasswordScreen"
           component={ResetPasswordScreen}

@@ -88,7 +88,7 @@ const InfoFood =  ({route}) => {
   return (
     
     <SafeAreaView style={styles.container}>
-        <Header title={item.title} isEnableIcon={true}/>
+        <Header title={item?.title} isEnableIcon={true}/>
         {renderFoodInformation()}
     </SafeAreaView>
   )

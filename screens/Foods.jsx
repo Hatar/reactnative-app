@@ -28,7 +28,7 @@ const Foods = () => {
 
   const dispatch = useDispatch()
   const { categories } = useSelector((state) => state.categories);
-  const [category, setCategory] = useState(categories[0].id);
+  const [category, setCategory] = useState(categories[0]?.id);
   const {tabName,foods} = useSelector((state) => state.foods)
 
 
@@ -160,7 +160,7 @@ const Foods = () => {
                 placeholder="Select Category..."
                 options={categories.map(category => ({
                   label: category.name,
-                  value: category.id,
+                  value: category?.id,
                 }))}
                 selectedValue={category}
                 onValueChange={(itemValue) => setCategory(itemValue)}

@@ -8,13 +8,13 @@ import Buttons from '../components/Buttons';
 import { useNavigation } from '@react-navigation/native';
 import { validationEmail,validationPassword } from '../helpers';
 import { useDispatch, useSelector } from 'react-redux';
-import { actSignIn } from '../redux/slices/auth/authSlice';
+import { actSignIn, clearStateAuth } from '../redux/slices/auth/authSlice';
 
 
 const Signin =() => {
 
-    const [email,setEmail] = useState({value:'amine@gmail.com',error:''})
-    const [password,setPassword] = useState({value:'Test134@#',error:''})
+    const [email,setEmail] = useState({value:'admin127@Uexample.com',error:''})
+    const [password,setPassword] = useState({value:'A2Pa$s1234',error:''})
     const navigation = useNavigation()
     const dispatch = useDispatch();
     const {loading,error,user} = useSelector((state) => state.auth);
@@ -29,7 +29,7 @@ const Signin =() => {
             return
         } 
         const response =await dispatch(actSignIn({email:email.value,password:password.value}))
-        if(response?.payload !=="Mot de passe incorrect.") {
+        if(response?.error?.message !== "Rejected") {
             await navigation.navigate('Home');
         }
     }
@@ -92,7 +92,10 @@ const Signin =() => {
 
             <View style={styles.row}>
                 <Text>Don’t have an account? </Text>
-                <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+                <TouchableOpacity onPress={() => {
+                    dispatch(clearStateAuth())
+                    navigation.navigate("Signup")
+                    }}>
                     <Text style={styles.link}>Sign up</Text>
                 </TouchableOpacity>
             </View>

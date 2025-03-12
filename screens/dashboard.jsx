@@ -7,8 +7,8 @@ const Dashboard =  () => {
   const {categories} = useSelector((state)=> state.categories)
   return (
     <SafeAreaView style={styles.container}>
-      <View className="flex-1 bg-gray-100 p-5">
-      <Text className="text-2xl font-bold text-gray-800 mb-5">Dashboard</Text>
+      <View className="flex-1 bg-gray-100 p-3">
+      <Text className="text-2xl font-bold text-gray-800 mb-3">Dashboard</Text>
 
       {/* Statistics Section */}
       <View className="space-y-6">
@@ -36,9 +36,8 @@ const Dashboard =  () => {
 }
 
 export const  styles = StyleSheet.create({
-    container:{
-      paddingTop: 15,
-      flex:1,
+  container:{
+    flex:1,
   },
 })
 
