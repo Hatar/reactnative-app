@@ -17,12 +17,12 @@ const Categories = () => {
 
     const haneleEditCategory = (category) => {
         setEditCategory(category)
-        setCategory(category.name)
+        setCategory(category.nameCategory)
     };
 
     const handleSaveEdit = async () => {
         if (editCategory && category.trim()) {
-          await dispatch(actEditCategory({ id: editCategory.id, name: category, }));
+          await dispatch(actEditCategory({ id: editCategory.categoryId, nameCategory: category, }));
           setEditCategory(null);
           setCategory("");
         }
@@ -40,14 +40,21 @@ const Categories = () => {
 
     const handleAddCategory = useCallback(async () => {
         if (category.trim() && category!=="") {
-            await dispatch(actAddCategory({ name: category }));
+            await dispatch(actAddCategory({ nameCategory: category }));
+            await dispatch(actGetCategories())
             setCategory("");
         }
     },[category,dispatch])
 
+
+    const handleCancel = () =>{
+        setEditCategory(null)
+        setCategory("")
+    }
+
     const renderCategory = ({ item }) => (
-        <View key={item.id} style={styles.categoryWrapper}>
-            <Text style={styles.category_name}>{item.name}</Text>
+        <View key={item.categoryId} style={styles.categoryWrapper}>
+            <Text style={styles.category_name}>{item.nameCategory}</Text>
             <View style={styles.btns}>
                 <Buttons
                     Icon={ICONS.EditIcon}
@@ -67,7 +74,7 @@ const Categories = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Add New Category</Text>
+            <Text style={styles.title}>{editCategory ? `Edit ${editCategory.nameCategory}` : "Add New Category"} </Text>
 
             <View style={styles.inputWrapper}>
                 <TextInput
@@ -78,23 +85,34 @@ const Categories = () => {
                     onChangeText={(text) => setCategory(text)}
                     customInput={styles.input}
                 />
-                {
-                editCategory ? (
+                <View style={styles.buttonContainer}>
                     <Buttons
-                        Icon={ICONS.EditIcon}
-                        pressHandler={handleSaveEdit}
-                        stylesText={styles.textButton}
+                        Icon={ICONS.closeIcon}
+                        title={"Cancel"}
+                        pressHandler={handleCancel}
+                        stylesText={styles.cancelTextButton}
                         stylesButton={styles.button}
                     />
-                ) : (
-                    <Buttons
-                        Icon={ICONS.AddIcon}
-                        pressHandler={handleAddCategory}
-                        stylesText={styles.textButton}
-                        stylesButton={styles.button}
-                    />
-                    ) 
-                }
+                    {
+                    editCategory ? (
+                        <Buttons
+                            Icon={ICONS.EditIcon}
+                            title={"Edit"}
+                            pressHandler={handleSaveEdit}
+                            stylesText={styles.textButton}
+                            stylesButton={styles.button}
+                        />
+                    ) : (
+                        <Buttons
+                            title={"Add"}
+                            Icon={ICONS.AddIcon}
+                            pressHandler={handleAddCategory}
+                            stylesText={styles.textButton}
+                            stylesButton={styles.button}
+                        />
+                        ) 
+                    }
+                </View>
                 
             </View>
 
@@ -104,7 +122,7 @@ const Categories = () => {
                 <FlatList
                     data={categories}
                     renderItem={renderCategory}
-                    keyExtractor={(item) =>  String(item.id) }
+                    keyExtractor={(item) =>  String(item.categoryId) }
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ overflow: "auto" }}
                 />
@@ -126,15 +144,12 @@ const Categories = () => {
 const styles = StyleSheet.create({
     container:{
         marginVertical: 30,
-        marginHorizontal:20,
+        marginHorizontal:15,
         flex:1
     },
     inputWrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 10,
         marginBottom: 20,
-        width: "85%"
+        width: "100%"
     },
     categoryWrapper: {
         flexDirection: "row",
@@ -173,13 +188,25 @@ const styles = StyleSheet.create({
         borderRadius: SIZES.medium,
     },
     textButton: {
-        color: COLORS.white,
+        color: COLORS.cardBg,
         fontFamily: FONTS.semiBold,
         fontSize: SIZES.large,
     },
     noCategoriesContainer: {
         alignItems: "center",
         marginTop: 20,
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 10,
+        gap: 10,
+    },
+    cancelTextButton: {
+        color: COLORS.cardBg,
+        fontSize: SIZES.medium,
+        fontWeight: "bold",
     },
 });
 

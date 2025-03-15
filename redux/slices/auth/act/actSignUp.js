@@ -14,8 +14,6 @@ export const actSignUp = createAsyncThunk(({role = "User"}) =>
             lastName,
             gender
         })
-        console.log("endpoint & res",endpoint,response)
-
         return response
     } catch (error) {
         return rejectWithValue(error)

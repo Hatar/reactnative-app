@@ -10,6 +10,7 @@ import { actDeleteFood } from "../redux/slices/food/foodSlice";
 const ModalWrapper = ({ item,countItems,typeModal, isModalVisible, disableModalConfirm }) => {
   const dispatch = useDispatch()
   const navigation = useNavigation()
+
   const handleCancel = useCallback(() => {
     disableModalConfirm();
   }, [disableModalConfirm]);
@@ -21,7 +22,7 @@ const ModalWrapper = ({ item,countItems,typeModal, isModalVisible, disableModalC
         if(countItems === 1)navigation.navigate('Home')
         break;
       case "DELETE_CATEGORY":
-        dispatch(actDeleteCategory(item.id));
+        dispatch(actDeleteCategory(item.categoryId));
         break;
       case "DELETE_FOOD":
         dispatch(actDeleteFood(item.id))
@@ -46,14 +47,14 @@ const ModalWrapper = ({ item,countItems,typeModal, isModalVisible, disableModalC
 
       <ModalContent style={styles.modalContent}>
         <Text style={styles.contentModal}>
-          You are about to delete <Text style={styles.itemDeleted}>{item?.title || item?.name}</Text>. This action
+          You are about to delete <Text style={styles.itemDeleted}>{item?.title || item?.name || item?.nameCategory}</Text>. This action
           cannot be undone.
         </Text>
         <View style={styles.buttonContainer}>
           <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
             <Text style={styles.buttonText}>Cancel</Text>
           </Pressable>
-          <Pressable style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
+          <Pressable style={[styles.button, styles.deleteButton]} onPress={()=> handleDelete()}>
             <Text style={[styles.buttonText, styles.deleteText]}>Delete</Text>
           </Pressable>
         </View>

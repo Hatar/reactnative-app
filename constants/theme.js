@@ -13,6 +13,7 @@ import NoFood from '../assets/noFoods.png'
 import eye from '../assets/eye.png'
 import eyeClose from '../assets/eyeclose.png'
 import profileIcon from "../assets/profile.png"
+import closeIcon from "../assets/close.png"
 
 import { Dimensions } from "react-native";
 const { width, height } = Dimensions.get("window");
@@ -66,6 +67,7 @@ export const ICONS = {
     NoFood,
     eye,
     eyeClose,
-    profileIcon
+    profileIcon,
+    closeIcon
 }
 

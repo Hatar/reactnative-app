@@ -16,10 +16,12 @@ import Cart from "../screens/Cart";
 import AdminScreen from "../screens/AdminScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import aboutIcon from "../assets/information-button.png";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Categories from "../screens/Categories";
 import Foods from "../screens/Foods";
 import Profile from "../screens/Profile";
+import { signOut } from "../redux/slices/auth/authSlice";
+import useIsAdmin from "../hooks/useIsAdmin";
 
 const Navigation = () => {
   const menuItems = [
@@ -45,14 +47,18 @@ const Navigation = () => {
     },
     { label: "About Us", navigateTo: "About Us", icon: aboutIcon },
   ]
+
+  const dispatch = useDispatch();
+
+
+  const isAdmin = useIsAdmin()
   const Stack = createNativeStackNavigator();
   const Drawer = createDrawerNavigator();
 
 
 
   const CustomDrawerContent = ({ navigation }) => {
-    const role = useSelector((state) => state.auth.role)
-    const filteredMenuItems = role ==="admin"
+    const filteredMenuItems = isAdmin
       ? menuItems
       : menuItems.filter(item => item.label !== "Categories" && item.label !== "Foods");
     const userMenuItems = [
@@ -66,11 +72,16 @@ const Navigation = () => {
       return uniqueItems.map((item, index) => (
         <TouchableOpacity
           key={index}
-          onPress={() =>
-            navigation.navigate(item.navigateTo, {
-              params: { menuId: item.id },
-            })
-          }
+          onPress={() =>{
+            if(item.label === "Sign Out") {
+              dispatch(signOut())
+              navigation.navigate("Signin")
+            } else {
+              navigation.navigate(item.navigateTo, {
+                params: { menuId: item.id },
+              })
+            }
+          }}
           style={styles.menuItem}
         >
           {item.icon && <Image style={styles.icons} source={item.icon} />}

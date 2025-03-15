@@ -1,10 +1,13 @@
 import BASE_URL from "../config/env"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const request = async (endpoint, method = 'GET', body = null, headers = {}) => {
   try {
+    const token = await AsyncStorage.getItem('token')
     const response = await fetch(`${BASE_URL}/${endpoint}`, {
       method,
       headers: {
         'Content-Type': 'application/json',
+        ...(token  && { Authorization: `Bearer ${token}` }),
         ...headers,
       },
       body: body ? JSON.stringify(body) : null,

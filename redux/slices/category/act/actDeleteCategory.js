@@ -1,14 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { FIREBASE_DB } from "../../../../firebase";
-import { doc, deleteDoc } from "firebase/firestore";
-
+import request from "../../../../servers/api";
 const actDeleteCategory = createAsyncThunk(
   "categories/actDeleteCategory",
   async (categoryId, { rejectWithValue }) => {
     try {
-      const categoryDocRef = doc(FIREBASE_DB, "categories", categoryId)
-      await deleteDoc(categoryDocRef)
-      return { id: categoryId }
+      await request(`category/${categoryId}`,"DELETE")
+      return categoryId
     } catch (error) {
       return rejectWithValue(error.message)
     }

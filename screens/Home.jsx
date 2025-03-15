@@ -10,23 +10,23 @@ import { useNavigation } from "@react-navigation/native";
 import { addItemToCart } from "../redux/slices/cart/cartSlice";
 import { isIncludeInCart } from "../helpers";
 import EmptyContent from "../components/EmptyContent";
+import useIsAdmin from "../hooks/useIsAdmin";
 
 function Home() {
   const navigation = useNavigation();
   const { categories } = useSelector((state) => state.categories);
   const { foods } = useSelector((state) => state.foods);
   const { items } = useSelector((state) => state.carts);
-  const role = useSelector((state) => state.auth.role);
-
   const [filterFoods,setFilterFoods] = useState([])
   const [activeCategory, setActiveCategory] = useState(null);
 
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
+  const isAdmin = useIsAdmin()
   const {width} = useWindowDimensions()
 
 
-  useEffect(() => {
+  useEffect (() => {
     dispatch(actGetCategories());
     dispatch(actGetFoods());
   }, [dispatch]);
@@ -57,77 +57,76 @@ function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {role !== "admin" ? (
-        <>
-          {categories.length > 0 && <Text style={styles.title}>Categories</Text> } 
-          <View>
-            <FlatList
-              data={categories}
-              horizontal
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <Buttons
-                  title={item.name}
-                  stylesText={styles.textButton}
-                  stylesButton={[styles.categoryButton,activeCategory === item.id && styles.activeCategoryBtn,]}
-                  pressHandler={()=> handleFilterFoodByCategory(item.id)}
-                />
-              )}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoryContainer}
-            />
-          </View>
-          {filterFoods.length > 0 && <Text style={styles.title}>Foods</Text>}
-          <View style={{flex:1}}>
-              {
-                filterFoods && filterFoods.length > 0 ? 
-                  (
-                    <FlatList
-                      data={filterFoods}
-                      keyExtractor={(item) => item.id.toString()}
-                      renderItem={({ item }) => (
-                        <TouchableOpacity 
-                          style={[styles.foodCard, !item.inStock && styles.disabledCard]} 
-                          onPress={() => navigation.navigate("InfoFood", { item })}
-                          disabled={!item.inStock}
-                        >
-                          <View style={styles.imageContainer}>
-                            <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
-                            {!item.inStock && (
-                              <View style={styles.outStockOverlay}>
-                                <Text style={styles.outStockText}>Out of Stock</Text>
-                              </View>
-                            )}
-                          </View>
-                          <View style={styles.foodInfo}>
-                            <Text style={styles.foodName} numberOfLines={1} ellipsizeMode="tail">
-                              {item.title}
-                            </Text>
-                            <Text style={styles.foodPrice}>{item.price}$</Text>
-                            <View style={styles.addToCartContainer}>
-                              <Buttons
-                                title="Add to Cart"
-                                pressHandler={() => item.inStock && handleAddToCart(item)}
-                                stylesText={styles.textButton}
-                                stylesButton={[styles.addToCartButton, !item.inStock && styles.disabledButton]}
-                                disabled={!item.inStock}
-                              />
-                            </View>
-                          </View>
-                        </TouchableOpacity>
-                      )}
-                      numColumns={width === 576 ? 3 : 2}
-                      columnWrapperStyle={styles.row}
-                      showsVerticalScrollIndicator={false}
-                    />
-                  )
-                : <EmptyContent title={"Foods"} image={ICONS.NoFood} />
-              }
-          </View>
-          
-        </>
-      ) : (
+      { isAdmin ? (
         <Dashboard />
+      ) : (
+        <>
+        {categories.length > 0 && <Text style={styles.title}>Categories</Text> } 
+        <View>
+          <FlatList
+            data={categories}
+            horizontal
+            keyExtractor={(item) => item.categoryId}
+            renderItem={({ item }) => (
+              <Buttons
+                title={item.nameCategory}
+                stylesText={styles.textButton}
+                stylesButton={[styles.categoryButton,activeCategory === item.categoryId && styles.activeCategoryBtn]}
+                pressHandler={()=> handleFilterFoodByCategory(item.id)}
+              />
+            )}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryContainer}
+          />
+        </View>
+        {filterFoods.length > 0 && <Text style={styles.title}>Foods</Text>}
+        <View style={{flex:1}}>
+            {
+              filterFoods && filterFoods.length > 0 ? 
+                (
+                  <FlatList
+                    data={filterFoods}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity 
+                        style={[styles.foodCard, !item.inStock && styles.disabledCard]} 
+                        onPress={() => navigation.navigate("InfoFood", { item })}
+                        disabled={!item.inStock}
+                      >
+                        <View style={styles.imageContainer}>
+                          <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
+                          {!item.inStock && (
+                            <View style={styles.outStockOverlay}>
+                              <Text style={styles.outStockText}>Out of Stock</Text>
+                            </View>
+                          )}
+                        </View>
+                        <View style={styles.foodInfo}>
+                          <Text style={styles.foodName} numberOfLines={1} ellipsizeMode="tail">
+                            {item.title}
+                          </Text>
+                          <Text style={styles.foodPrice}>{item.price}$</Text>
+                          <View style={styles.addToCartContainer}>
+                            <Buttons
+                              title="Add to Cart"
+                              pressHandler={() => item.inStock && handleAddToCart(item)}
+                              stylesText={styles.textButton}
+                              stylesButton={[styles.addToCartButton, !item.inStock && styles.disabledButton]}
+                              disabled={!item.inStock}
+                            />
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    )}
+                    numColumns={width === 576 ? 3 : 2}
+                    columnWrapperStyle={styles.row}
+                    showsVerticalScrollIndicator={false}
+                  />
+                )
+              : <EmptyContent title={"Foods"} image={ICONS.NoFood} />
+            }
+        </View>
+      </>
       )}
     </SafeAreaView>
   );

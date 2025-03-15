@@ -19,7 +19,7 @@ const authSlice = createSlice({
     signOut: (state) =>{
       AsyncStorage.removeItem("token")
       state.token=null
-      stte.role=null
+      state.role=null
     },
     setUserInfo:(state) =>{
       state.user=state
@@ -38,7 +38,6 @@ const authSlice = createSlice({
     }),
     builder.addCase(actSignIn.fulfilled,(state,action) =>{
       state.token= action.payload.token
-      console.log("check rolle",jwtDecode(action.payload.token))
       state.role = action.payload ? jwtDecode(action.payload.token).role :null
       state.error = null
       state.loading=false
@@ -66,6 +65,6 @@ const authSlice = createSlice({
 });
 
 export {actSignIn,actSignUp}
-export const {clearStateAuth} = authSlice.actions
+export const {clearStateAuth,signOut} = authSlice.actions
 
 export default authSlice.reducer;

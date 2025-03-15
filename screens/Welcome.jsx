@@ -5,9 +5,8 @@ import Buttons from '../components/Buttons'
 import {
   useNavigation,
 } from '@react-navigation/native';
-
-const Welcome = ( ) =>{
-  const [isLoggged,setIslogged] = useState(false)
+import AsyncStorage from "@react-native-async-storage/async-storage";
+const Welcome =() =>{
   const navigation = useNavigation()
   const duration = 1000;
   const delay = duration + 300;
@@ -16,9 +15,12 @@ const Welcome = ( ) =>{
   const fadeTextAnimation = useRef(new Animated.Value(0)).current;
   const moveButtonAnimation = useRef(new Animated.Value(1)).current;
   
+  // get token
+
   
-  const onPress = () => {
-    if(isLoggged) {
+  const onPress = async () => {
+    const token = await AsyncStorage.getItem('token')
+    if(token) {
       navigation.navigate("Home")
     } else navigation.navigate("Signin")
   }

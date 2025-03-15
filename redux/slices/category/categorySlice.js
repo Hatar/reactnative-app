@@ -23,9 +23,7 @@ const categorySlice = createSlice({
         }),
         builder.addCase(actGetCategories.fulfilled,(state,action) =>{
             state.loading="succeeded",
-            state.categories = [
-                ...new Map(action.payload.map((category) => [category.id, category])).values(),
-            ];
+            state.categories = action.payload
               
         }),
         builder.addCase(actGetCategories.rejected,(state,action) =>{
@@ -42,10 +40,6 @@ const categorySlice = createSlice({
         }),
         builder.addCase(actAddCategory.fulfilled, (state, action) => {
             state.loading = "succeeded";
-            const categoryExists = state.categories.some((category) => category.id === action.payload.id);
-            if (!categoryExists) {
-            state.categories = [...state.categories, action.payload];
-            }
         }),
         builder.addCase(actAddCategory.rejected, (state, action) => {
             state.loading = "failed";
@@ -63,7 +57,7 @@ const categorySlice = createSlice({
 
         builder.addCase(actEditCategory.fulfilled, (state, action) => {
             state.loading = "succeeded";
-            const index = state.categories.findIndex((category) => category.id === action.payload.id);
+            const index = state.categories.findIndex((category) => category.categoryId === action.payload.categoryId);
             if (index !== -1) {
                 state.categories[index] = action.payload;
             }
@@ -82,7 +76,7 @@ const categorySlice = createSlice({
         });
         builder.addCase(actDeleteCategory.fulfilled, (state, action) => {
             state.loading = "succeeded";
-            const index = state.categories.findIndex((category) => category.id === action.payload.id);
+            const index = state.categories.findIndex((category) => category.categoryId === action.payload);
             if (index !== -1) {
                 state.categories.splice(index, 1)
             }
