@@ -7,7 +7,7 @@ const request = async (endpoint, method = 'GET', body = null, headers = {}) => {
       method,
       headers: {
         'Content-Type': 'application/json',
-        ...(token  && { Authorization: `Bearer ${token}` }),
+        Authorization: token ? `Bearer ${token.trim()}` : "",
         ...headers,
       },
       body: body ? JSON.stringify(body) : null,

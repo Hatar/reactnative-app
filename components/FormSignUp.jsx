@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -13,8 +13,9 @@ import TextInput from "../components/TextInput";
 import Buttons from "../components/Buttons";
 import { COLORS, FONTS, SIZES } from "../constants";
 import { actSignUp } from "../redux/slices/auth/authSlice";
+import { actEditSubAdmin } from "../redux/slices/admin/adminSlice";
 
-const FormSignUp = ({ role }) => {
+const FormSignUp = ({ role ,adminData,clearForm,tabName}) => {
   
     const { error, loading } = useSelector((state) => state.auth);
   const navigation = useNavigation();
@@ -56,19 +57,26 @@ const FormSignUp = ({ role }) => {
       isValid = false;
     }
 
-    if (passwordError) {
-      setPassword((prev) => ({ ...prev, error: passwordError }));
-      isValid = false;
-    }
-
-    if (confirmPasswordError) {
-      setConfirmPassword((prev) => ({ ...prev, error: confirmPasswordError }));
-      isValid = false;
+    if(tabName !== "updateTab") {
+      if (passwordError) {
+        setPassword((prev) => ({ ...prev, error: passwordError }));
+        isValid = false;
+      }
+  
+      if (confirmPasswordError) {
+        setConfirmPassword((prev) => ({ ...prev, error: confirmPasswordError }));
+        isValid = false;
+      }
     }
     // If all validations pass, proceed with Firebase authentication
+    console.log("tes form",isValid,tabName)
     if (isValid) {
-      const response = await dispatch(
-        actSignUp({
+
+      console.log("tabName",tabName)
+      let sendPayload = null
+      let response= null
+      if(tabName !== "updateTab") {
+        sendPayload ={
           role,
           email: email.value,
           password: password.value,
@@ -76,21 +84,44 @@ const FormSignUp = ({ role }) => {
           firstName: firstname.value,
           lastName: lastname.value,
           gender,
-        })
-      );
+        }
+        response = await dispatch(actSignUp(sendPayload))
+      } else {
+        sendPayload ={
+          userId:adminData.userId,
+          firstName: firstname.value,
+          lastName: lastname.value,
+          email: email.value
+        }
+        response = await dispatch(actEditSubAdmin(sendPayload))
+        
+      }
       if (response?.payload?.message === "user ajouté avec succès") {
         if(role ==="Admin"){
-            await navigation.navigate("Home");
+          await navigation.navigate("Home");
         } else {
-            await navigation.navigate("Signin");
+          await navigation.navigate("Signin");
         }
       }
     }
   };
+
+
+  useEffect(()=>{
+    if(adminData){
+      setFirstname({ value: adminData.firstName, error: "" })
+      setLastname({ value: adminData.lastName, error: "" })
+      setEmail({ value: adminData.email, error: "" })
+    } else if (clearForm && adminData === null) {
+      setFirstname({ value: "", error: "" })
+      setLastname({ value: "", error: "" })
+      setEmail({ value: "", error: "" })
+    }
+  },[adminData,clearForm])
   
   return (
     <>
-      <Text className="text-xl font-medium text-red-600 my-1">
+      <Text className="text-xl font-medium text-red-600">
         {error}
       </Text>
       <TextInput
@@ -119,51 +150,61 @@ const FormSignUp = ({ role }) => {
         returnKeyType="next"
         onChangeText={(text) => setEmail({ value: text, error: "" })}
       />
-      <TextInput
-        placeholder={"Enter Your Password"}
-        value={password.value}
-        errortext={password.error}
-        secureTextEntry
-        textContentType="oneTimeCode"
-        onChangeText={(text) => setPassword({ value: text, error: "" })}
-      />
-      <TextInput
-        placeholder={"Confirm Password"}
-        value={confirmPassword.value}
-        errortext={confirmPassword.error}
-        secureTextEntry
-        textContentType="oneTimeCode"
-        onChangeText={(text) => setConfirmPassword({ value: text, error: "" })}
-      />
 
-      <View
-        style={{ flexDirection: "row", justifyContent: "flex-start", gap: 10 }}
-      >
-        <View style={styles.section_checkbox}>
-          <Checkbox
-            style={styles.checkbox}
-            color={COLORS.cardBg}
-            value={gender === "Male"}
-            onValueChange={() => setGender("Male")}
-          />
-          <Text style={styles.paragraph}>Male</Text>
-        </View>
-        <View style={styles.section_checkbox}>
-          <Checkbox
-            style={styles.checkbox}
-            color={COLORS.cardBg}
-            value={gender === "Female"}
-            onValueChange={() => setGender("Female")}
-          />
-          <Text style={styles.paragraph}>Famale</Text>
-        </View>
-      </View>
+
+      {
+        tabName && tabName !== "updateTab" && (
+          <>
+            <TextInput
+              placeholder={"Enter Your Password"}
+              value={password.value}
+              errortext={password.error}
+              secureTextEntry
+              textContentType="oneTimeCode"
+              onChangeText={(text) => setPassword({ value: text, error: "" })}
+            />
+            <TextInput
+              placeholder={"Confirm Password"}
+              value={confirmPassword.value}
+              errortext={confirmPassword.error}
+              secureTextEntry
+              textContentType="oneTimeCode"
+              onChangeText={(text) => setConfirmPassword({ value: text, error: "" })}
+            />
+
+            <View
+              style={{ flexDirection: "row", justifyContent: "flex-start", gap: 10 }}
+            >
+              <View style={styles.section_checkbox}>
+                <Checkbox
+                  style={styles.checkbox}
+                  color={COLORS.cardBg}
+                  value={gender === "Male"}
+                  onValueChange={() => setGender("Male")}
+                />
+                <Text style={styles.paragraph}>Male</Text>
+              </View>
+              <View style={styles.section_checkbox}>
+                <Checkbox
+                  style={styles.checkbox}
+                  color={COLORS.cardBg}
+                  value={gender === "Female"}
+                  onValueChange={() => setGender("Female")}
+                />
+                <Text style={styles.paragraph}>Famale</Text>
+              </View>
+            </View>
+          </>
+        )
+      }
+
+      
 
       {loading ? (
         <ActivityIndicator size="large" color={COLORS.bg} />
       ) : (
         <Buttons
-          title={role === "Admin" ? "Create" : "Sign Up"}
+          title={role === "Admin" && tabName == "updateTab" ? "Update Admin" : role !== "Admin" ? "Sign Up" : "Admin Admin" }
           pressHandler={onSignUpPressed}
           stylesText={styles.textButton}
           stylesButton={styles.button}

@@ -11,6 +11,7 @@ import { addItemToCart } from "../redux/slices/cart/cartSlice";
 import { isIncludeInCart } from "../helpers";
 import EmptyContent from "../components/EmptyContent";
 import useIsAdmin from "../hooks/useIsAdmin";
+import { actGetListAdmin } from "../redux/slices/admin/adminSlice";
 
 function Home() {
   const navigation = useNavigation();
@@ -27,6 +28,7 @@ function Home() {
 
 
   useEffect (() => {
+    dispatch(actGetListAdmin())
     dispatch(actGetCategories());
     dispatch(actGetFoods());
   }, [dispatch]);

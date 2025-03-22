@@ -6,6 +6,7 @@ import { deleteItemFromCart } from "../redux/slices/cart/cartSlice";
 import { useNavigation } from "@react-navigation/native";
 import { actDeleteCategory } from "../redux/slices/category/categorySlice";
 import { actDeleteFood } from "../redux/slices/food/foodSlice";
+import actDeleteSubAdmin from "../redux/slices/admin/act/actDeleteSubAdmin";
 
 const ModalWrapper = ({ item,countItems,typeModal, isModalVisible, disableModalConfirm }) => {
   const dispatch = useDispatch()
@@ -27,6 +28,9 @@ const ModalWrapper = ({ item,countItems,typeModal, isModalVisible, disableModalC
       case "DELETE_FOOD":
         dispatch(actDeleteFood(item.id))
         break;
+      case "DELETE_SUB_ADMIN":
+          dispatch(actDeleteSubAdmin(item.userId))
+          break;
       default:
         break;
     }
@@ -47,7 +51,7 @@ const ModalWrapper = ({ item,countItems,typeModal, isModalVisible, disableModalC
 
       <ModalContent style={styles.modalContent}>
         <Text style={styles.contentModal}>
-          You are about to delete <Text style={styles.itemDeleted}>{item?.title || item?.name || item?.nameCategory}</Text>. This action
+          You are about to delete <Text style={styles.itemDeleted}>{item?.title || item?.name || item?.nameCategory || `${item?.firstName}-${item?.lastName}`}</Text>. This action
           cannot be undone.
         </Text>
         <View style={styles.buttonContainer}>

@@ -14,6 +14,8 @@ import eye from '../assets/eye.png'
 import eyeClose from '../assets/eyeclose.png'
 import profileIcon from "../assets/profile.png"
 import closeIcon from "../assets/close.png"
+import adminIcon from "../assets/admin.png"
+import listIcon from "../assets/list.png"
 
 import { Dimensions } from "react-native";
 const { width, height } = Dimensions.get("window");
@@ -68,6 +70,8 @@ export const ICONS = {
     eye,
     eyeClose,
     profileIcon,
-    closeIcon
+    closeIcon,
+    adminIcon,
+    listIcon
 }
 

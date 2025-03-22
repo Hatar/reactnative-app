@@ -13,7 +13,7 @@ import { actSignIn, clearStateAuth } from '../redux/slices/auth/authSlice';
 
 const Signin =() => {
 
-    const [email,setEmail] = useState({value:'admin127@Uexample.com',error:''})
+    const [email,setEmail] = useState({value:'adminnnnn@Uexample.com',error:''})
     const [password,setPassword] = useState({value:'A2Pa$s1234',error:''})
     const navigation = useNavigation()
     const dispatch = useDispatch();
