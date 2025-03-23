@@ -50,10 +50,9 @@ const CartItems = ({ orderList,total }) => {
     // 1. Create a payment intent
 		
     const response = await dispatch(actApiPayment({
-		  amount: total,
+		  amount: Math.floor(total * 100),
       serverNode:true
 		}));
-		console.log("response actApiPayment",response)
     if (response.error) {
 		  Alert.alert('Something went wrong', response.error);
 		  return;
