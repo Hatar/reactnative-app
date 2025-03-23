@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux'
 
 const Header =({title,isEnableIcon}) =>{
   const navigation = useNavigation()
-  const {role} = useSelector((state)=>state.user)
+  const {role} = useSelector((state)=>state.auth)
   return (
     <View style={styles.header}>
         <BackButton goBack={navigation.goBack} />

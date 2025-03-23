@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import request from "../../../../servers/api";
+import request from "../../../../apis";
 
 export const actSignUp = createAsyncThunk(({role = "User"}) =>
     `auth/actSignUp/${role}`,async ({role = "User",email,password,confirmPassword,firstName,lastName,gender},thunkAPI) =>{

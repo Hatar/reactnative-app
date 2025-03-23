@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import request from "../../../../servers/api";
+import request from "../../../../apis";
 
 const actEditSubAdmin = createAsyncThunk(
   "admin/actEditSubAdmin",

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import request from "../../../../servers/api";
+import request from "../../../../apis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const actSignIn = createAsyncThunk("auth/SignIn",async ({email,password},thunkAPI) =>{
