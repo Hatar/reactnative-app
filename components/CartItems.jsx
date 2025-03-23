@@ -9,22 +9,29 @@ import {
   SafeAreaView,
   ScrollView,
   useWindowDimensions,
+  Alert,
 } from "react-native";
 import { COLORS, ICONS, SIZES } from "../constants";
 import Buttons from "./Buttons";
 import { useDispatch } from "react-redux";
 import { decreaseQuantity, increaseQuantity } from "../redux/slices/cart/cartSlice";
-import { useNavigation } from '@react-navigation/native'
 import ModalWrapper from "./ModalWrapper.jsx"
+import actApiPayment from "../redux/slices/cart/act/actApiPayment.js";
+import { useStripe } from "@stripe/stripe-react-native";
 const CartItems = ({ orderList,total }) => {
-  const navigation = useNavigation()
-  const dispatch = useDispatch();
+  
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [food,setFood] = useState(null)
+  const styles = getStyles(width)
+
+  const dispatch = useDispatch();
 
   const {width} = useWindowDimensions()
 
-  const styles = getStyles(width)
+
+	const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
 
   const deleteItem = (item) =>{
     setModalVisible(!isModalVisible);
@@ -38,6 +45,49 @@ const CartItems = ({ orderList,total }) => {
   const decreaseQty = useCallback((item) => {
     dispatch(decreaseQuantity(item));
   },[dispatch])
+
+  const onCheckout = async () => {
+    // 1. Create a payment intent
+		
+    const response = await dispatch(actApiPayment({
+		  amount: total,
+      serverNode:true
+		}));
+		console.log("response actApiPayment",response)
+    if (response.error) {
+		  Alert.alert('Something went wrong', response.error);
+		  return;
+		}
+
+    // 2. initialize the payment sheet
+    const { error: paymentSheetError } = await initPaymentSheet({
+		  paymentIntentClientSecret: response.payload.paymentIntent,
+		  defaultBillingDetails: {
+		    name: "Amine Hatar",
+		  },
+		})
+
+    if (paymentSheetError) {
+      console.log("initPaymentSheet Error:", paymentSheetError);
+      Alert.alert('Something went wrong', paymentSheetError.message);
+      return;
+    }
+
+    // 3. Present the Payment sheet from stripe
+    const { error: paymentError } = await presentPaymentSheet();
+    console.log("failed,paymentError",paymentError)
+    if (paymentError) {
+      Alert.alert(`Error code: ${paymentError.code}`, paymentError.message);
+      return;
+    }
+
+    // onCreateOrder();
+  };
+
+
+  const onCreateOrder = () =>{
+    
+  }
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -80,14 +130,12 @@ const CartItems = ({ orderList,total }) => {
         typeModal={"DELETE_ITEM_FROM_CART"}
         countItems={orderList.length}
       />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <FlatList
-          data={orderList}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
-        />
-      </ScrollView>
+      <FlatList
+        data={orderList}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+      />
       <View style={styles.footer}>
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>Total:</Text>
@@ -95,7 +143,7 @@ const CartItems = ({ orderList,total }) => {
         </View>
         <Buttons
           title="Confirm Order"
-          pressHandler={() => navigation.navigate("Cart")}
+          pressHandler={() =>onCheckout()}
           stylesText={styles.buttonText}
           stylesButton={styles.button}
         />
