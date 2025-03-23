@@ -15,7 +15,7 @@ import { COLORS, FONTS, SIZES } from "../constants";
 import { actSignUp } from "../redux/slices/auth/authSlice";
 import { actEditSubAdmin } from "../redux/slices/admin/adminSlice";
 
-const FormSignUp = ({ role ,adminData,clearForm,tabName}) => {
+const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm}) => {
   
     const { error, loading } = useSelector((state) => state.auth);
   const navigation = useNavigation();
@@ -69,10 +69,7 @@ const FormSignUp = ({ role ,adminData,clearForm,tabName}) => {
       }
     }
     // If all validations pass, proceed with Firebase authentication
-    console.log("tes form",isValid,tabName)
     if (isValid) {
-
-      console.log("tabName",tabName)
       let sendPayload = null
       let response= null
       if(tabName !== "updateTab") {
@@ -94,7 +91,7 @@ const FormSignUp = ({ role ,adminData,clearForm,tabName}) => {
           email: email.value
         }
         response = await dispatch(actEditSubAdmin(sendPayload))
-        
+        if (response?.payload?.message === "User updated successfully") setToggleForm("listTab")
       }
       if (response?.payload?.message === "user ajouté avec succès") {
         if(role ==="Admin"){

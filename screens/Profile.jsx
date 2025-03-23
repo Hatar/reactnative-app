@@ -58,7 +58,7 @@ const Profile = () => {
                   Icon={ICONS.deleteIcon}
                   pressHandler={() => handleAdmin("delete",item)}
                   stylesText={styles.textButton}
-                  stylesButton={[styles.btn_action,styles.listIcon]}
+                  stylesButton={styles.btn_action}
               />
           </View>
       </View>
@@ -97,6 +97,7 @@ const Profile = () => {
               adminData={adminData} 
               clearForm={clearForm}
               tabName={toggleForm}
+              setToggleForm={setToggleForm}
             />
           ) :admins.length > 0 && (
               <FlatList

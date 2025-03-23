@@ -39,9 +39,11 @@ const adminSlice = createSlice({
 
     builder.addCase(actEditSubAdmin.fulfilled, (state, action) => {
         state.loading = "succeeded";
-        const index = state.admins.findIndex((admin) => admin.userId === action.payload.userId);
+        const index = state.admins.findIndex((admin) => admin.userId === action.payload.user.userId);
         if (index !== -1) {
-            state.admins[index] = action.payload;
+          state.admins[index].firstName = action.payload.user.firstName
+          state.admins[index].lastName = action.payload.user.lastName
+          state.admins[index].email = action.payload.user.email
         }
     })
     builder.addCase(actEditSubAdmin.rejected, (state, action) => {

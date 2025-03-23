@@ -14,8 +14,13 @@ const actEditSubAdmin = createAsyncThunk(
             email:adminData.email
         }
     )
-      console.log("update admin",response)
-      return response
+    return  {
+      ...response,
+      user: {
+        ...response.user,
+        userId: adminData.userId
+      }
+    };
     } catch (error) {
       return rejectWithValue(error.message);
     }

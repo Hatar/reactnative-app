@@ -21,8 +21,6 @@ import Categories from "../screens/Categories";
 import Foods from "../screens/Foods";
 import Profile from "../screens/Profile";
 import { signOut } from "../redux/slices/auth/authSlice";
-import useIsAdmin from "../hooks/useIsAdmin";
-
 const Navigation = () => {
   const menuItems = [
     { 
@@ -51,14 +49,12 @@ const Navigation = () => {
   const dispatch = useDispatch();
 
 
-  const isAdmin = useIsAdmin()
+  const {role} = useSelector((state) => state.auth);
   const Stack = createNativeStackNavigator();
   const Drawer = createDrawerNavigator();
 
-
-
   const CustomDrawerContent = ({ navigation }) => {
-    const filteredMenuItems = isAdmin
+    const filteredMenuItems = role === "admin"
       ? menuItems
       : menuItems.filter(item => item.label !== "Categories" && item.label !== "Foods");
     const userMenuItems = [
@@ -105,7 +101,6 @@ const Navigation = () => {
     const uniqueMenuItems = Array.from(
       new Map(menuItems.map((item) => [item.label, item])).values()
     );
-    const role = useSelector((state) => state.auth.role);
     const getComponentForMenu = (label) => {
       switch (label) {
         case "Profile":
