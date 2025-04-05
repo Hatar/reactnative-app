@@ -128,7 +128,6 @@ const Navigation = () => {
             role !=="admin" ? (
               <TouchableOpacity
                 onPress={() => {
-                  console.log("Right icon pressed");
                 }}
                 style={{ marginRight: 15 }}
               >
@@ -159,7 +158,7 @@ const Navigation = () => {
     );
   };
   return (
-    <NavigationContainer>
+    <>
       <Stack.Navigator
         initialRouteName="Welcome"
         screenOptions={{
@@ -181,7 +180,7 @@ const Navigation = () => {
         <Stack.Screen name="Checkout" component={Checkout} />
         <Stack.Screen name="Cart" component={Cart} />
       </Stack.Navigator>
-    </NavigationContainer>
+    </>
   );
 };
 

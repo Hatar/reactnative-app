@@ -5,13 +5,11 @@ import { COLORS, FONTS, ICONS, SIZES } from "../constants";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actAddCategory, actGetCategories, actEditCategory } from "../redux/slices/category/categorySlice";
-import ModalWrapper from "../components/ModalWrapper"
 import EmptyContent from "../components/EmptyContent";
+import {toggleDisplayModal } from "../redux/slices/General/generalSlice";
 const Categories = () => {
-    const [isModalVisible,setModalVisible] = useState(false)
     const [category, setCategory] = useState("");
     const [editCategory,setEditCategory] = useState(null)
-    const [categoryDeleted,setCategoryDelete] = useState(null)
     const { loading, categories } = useSelector((state) => state.categories);
     const dispatch = useDispatch();
 
@@ -30,8 +28,7 @@ const Categories = () => {
 
 
     const handleDeleteCategory = (item)=>{
-        setCategoryDelete(item)
-        setModalVisible(true)
+        dispatch(toggleDisplayModal({ typeModal: "DELETE_CATEGORY", itemModal: item }))  
     }
 
     useEffect(() => {
@@ -129,14 +126,6 @@ const Categories = () => {
             ) : 
                 <EmptyContent title={"categories"} image={ICONS.NoFood} />
             }
-
-            <ModalWrapper 
-                isModalVisible={isModalVisible}
-                disableModalConfirm={()=> setModalVisible(false)}
-                item={categoryDeleted}
-                typeModal={"DELETE_CATEGORY"}
-                countItems={categories.length}
-            />
         </SafeAreaView>
     );
 };

@@ -29,7 +29,11 @@ const foodSlice = createSlice({
             state.errror=null
         }),
         builder.addCase(actGetFoods.fulfilled,(state,action) =>{
-            state.loading="succeeded",
+            state.loading="succeeded"
+            if (action.payload.length === 0) {
+                state.foods = [];
+                return;
+            }
             state.foods = [
                 ...new Map(action.payload.map((food) => [food.id, food])).values(),
             ];

@@ -1,49 +1,54 @@
 import React, { useCallback } from "react";
 import { ModalContent, BottomModal } from "react-native-modals";
 import { Text, StyleSheet, View, Pressable } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteItemFromCart } from "../redux/slices/cart/cartSlice";
 import { useNavigation } from "@react-navigation/native";
 import { actDeleteCategory } from "../redux/slices/category/categorySlice";
 import { actDeleteFood } from "../redux/slices/food/foodSlice";
 import actDeleteSubAdmin from "../redux/slices/admin/act/actDeleteSubAdmin";
+import { toggleDisplayModal } from "../redux/slices/General/generalSlice";
 
-const ModalWrapper = ({ item,countItems,typeModal, isModalVisible, disableModalConfirm }) => {
+const ModalWrapper = () => {
+  const {isModalVisible,typeModal,itemModal} = useSelector((state) => {
+    return state.generals
+  })
   const dispatch = useDispatch()
   const navigation = useNavigation()
 
-  const handleCancel = useCallback(() => {
-    disableModalConfirm();
-  }, [disableModalConfirm]);
-
   const handleDelete = useCallback(() => {
+    if (!typeModal || !itemModal) return;
     switch (typeModal) {
       case "DELETE_ITEM_FROM_CART":
-        dispatch(deleteItemFromCart(item))
+        dispatch(deleteItemFromCart(itemModal))
         if(countItems === 1)navigation.navigate('Home')
         break;
       case "DELETE_CATEGORY":
-        dispatch(actDeleteCategory(item.categoryId));
+        dispatch(actDeleteCategory(itemModal.categoryId));
         break;
       case "DELETE_FOOD":
-        dispatch(actDeleteFood(item.id))
+        dispatch(actDeleteFood(itemModal.id))
         break;
       case "DELETE_SUB_ADMIN":
-          dispatch(actDeleteSubAdmin(item.userId))
+          dispatch(actDeleteSubAdmin(itemModal.userId))
           break;
       default:
         break;
     }
-    disableModalConfirm();
-  }, [disableModalConfirm]);
+    dispatch(toggleDisplayModal())
+  }, []);
+
+
+  const handleCloseModal = useCallback(() => {
+    dispatch(toggleDisplayModal())
+  },[])
 
   return (
     <BottomModal
       visible={isModalVisible}
-      onTouchOutside={disableModalConfirm}
+      onTouchOutside={handleCloseModal}
       height={0.25}
       width={1}
-      onSwipeOut={disableModalConfirm}
     >
       <View style={styles.modalTitleContainer}>
         <Text style={styles.modalTitleText}>Are you sure?</Text>
@@ -51,11 +56,11 @@ const ModalWrapper = ({ item,countItems,typeModal, isModalVisible, disableModalC
 
       <ModalContent style={styles.modalContent}>
         <Text style={styles.contentModal}>
-          You are about to delete <Text style={styles.itemDeleted}>{item?.title || item?.name || item?.nameCategory || `${item?.firstName}-${item?.lastName}`}</Text>. This action
+          You are about to delete <Text style={styles.itemDeleted}>{itemModal?.title || itemModal?.name || itemModal?.nameCategory || `${itemModal?.firstName}-${itemModal?.lastName}`}</Text>. This action
           cannot be undone.
         </Text>
         <View style={styles.buttonContainer}>
-          <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
+          <Pressable style={[styles.button, styles.cancelButton]} onPress={()=> handleCloseModal()}>
             <Text style={styles.buttonText}>Cancel</Text>
           </Pressable>
           <Pressable style={[styles.button, styles.deleteButton]} onPress={()=> handleDelete()}>

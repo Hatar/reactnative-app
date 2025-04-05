@@ -28,6 +28,9 @@ const authSlice = createSlice({
       state.user=null,
       state.error=null,
       state.role=null
+    },
+    setTypeRole:(state,action) =>{
+      state.role=action.payload
     }
   },
   extraReducers: (builder) =>{
@@ -38,14 +41,17 @@ const authSlice = createSlice({
     }),
     builder.addCase(actSignIn.fulfilled,(state,action) =>{
       state.token= action.payload.token
-      state.role = action.payload ? jwtDecode(action.payload.token).role :null
+      if(action.payload && action.payload.token) {
+        state.role = action.payload ? jwtDecode(action.payload.token).role :null
+      }
       state.error = null
       state.loading=false
 
     })
-    builder.addCase(actSignIn.rejected,(state,action) =>{
-      state.error = action.payload
+    builder.addCase(actSignIn.rejected,(state) =>{
+      state.error = "Network request failed"
       state.loading=false
+
     })
 
     // SignUp
@@ -65,6 +71,6 @@ const authSlice = createSlice({
 });
 
 export {actSignIn,actSignUp}
-export const {clearStateAuth,signOut} = authSlice.actions
+export const {clearStateAuth,signOut,setTypeRole} = authSlice.actions
 
 export default authSlice.reducer;

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Animated, Image, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { COLORS, FONTS, ICONS, SIZES } from '../constants'
 import Buttons from '../components/Buttons'
@@ -6,6 +6,9 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from 'react-redux';
+import { setTypeRole } from '../redux/slices/auth/authSlice';
+import { jwtDecode } from "jwt-decode";
 const Welcome =() =>{
   const navigation = useNavigation()
   const duration = 1000;
@@ -14,12 +17,12 @@ const Welcome =() =>{
   const positionAnimation = useRef(new Animated.ValueXY({ x: 0, y: -300 })).current;
   const fadeTextAnimation = useRef(new Animated.Value(0)).current;
   const moveButtonAnimation = useRef(new Animated.Value(1)).current;
-  
-  // get token
-
-  
+  const dispatch = useDispatch();
   const onPress = async () => {
     const token = await AsyncStorage.getItem('token')
+    if(token) {
+      dispatch(setTypeRole(jwtDecode(token).role))
+    }
     if(token) {
       navigation.navigate("Home")
     } else navigation.navigate("Signin")
@@ -34,7 +37,7 @@ const Welcome =() =>{
         useNativeDriver: true,
       }),
       Animated.timing(positionAnimation, {
-        toValue: { x: 0, y: 0 }, // Move to the right position (x = 200, y = 0)
+        toValue: { x: 0, y: 0 },
         duration: 1000,
         useNativeDriver: true,
       }),

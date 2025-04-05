@@ -7,7 +7,7 @@ import "./global.css"
 
 const ReduxApp = () => (
     <Provider store={store}>
-        <App />
+      <App />
       <ModalPortal/>
     </Provider>
   );

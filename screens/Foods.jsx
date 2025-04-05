@@ -156,15 +156,20 @@ const Foods = () => {
           <>
             <Text style={styles.title}> {editFood ? `Edit ${editFood.title}`  : "Add New Foods" } </Text>
             <View style={styles.inputWrapper}>
-              <DropdownSelect
-                placeholder="Select Category..."
-                options={categories.map(category => ({
-                  label: category.name,
-                  value: category?.id,
-                }))}
-                selectedValue={category}
-                onValueChange={(itemValue) => setCategory(itemValue)}
-              />
+              {
+                categories && categories.length > 0 && (
+                  <DropdownSelect
+                    placeholder="Select Category..."
+                    options={categories.map(category => ({
+                      label: category.name,
+                      value: category?.id,
+                    }))}
+                    selectedValue={category}
+                    onValueChange={(itemValue) => setCategory(itemValue)}
+                  />
+                ) 
+              }
+              
               <TextInput
                 placeholder="Title"
                 value={title}

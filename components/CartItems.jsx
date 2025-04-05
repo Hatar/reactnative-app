@@ -67,26 +67,17 @@ const CartItems = ({ orderList,total }) => {
 		})
 
     if (paymentSheetError) {
-      console.log("initPaymentSheet Error:", paymentSheetError);
       Alert.alert('Something went wrong', paymentSheetError.message);
       return;
     }
 
     // 3. Present the Payment sheet from stripe
     const { error: paymentError } = await presentPaymentSheet();
-    console.log("failed,paymentError",paymentError)
     if (paymentError) {
       Alert.alert(`Error code: ${paymentError.code}`, paymentError.message);
       return;
     }
-
-    // onCreateOrder();
   };
-
-
-  const onCreateOrder = () =>{
-    
-  }
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>

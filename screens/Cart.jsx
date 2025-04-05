@@ -5,9 +5,7 @@ import { COLORS,FONTS,SIZES } from '../constants'
 import Buttons from '../components/Buttons'
 
 const Cart =() => {
-  const onPress = () =>{
-    console.log("clicked")
-  }
+  const onPress = () =>{}
   return (
     <SafeAreaView style={styles.container}>
         <Header isEnableIcon={false}/>
@@ -15,13 +13,13 @@ const Cart =() => {
             <Text style={styles.header_title}>Payment Method</Text>
 
             <Buttons
-                title="Credit Or Debit"
+                title="Stripe"
                 pressHandler={onPress}
                 stylesText={styles.textButton}
                 stylesButton={[styles.button, { backgroundColor: COLORS.black }]}
             />
             <Buttons
-                title="Apple Pay"
+                title="Paypal"
                 pressHandler={onPress}
                 stylesText={styles.textButton}
                 stylesButton={[styles.button, { backgroundColor: COLORS.errors }]}
