@@ -88,7 +88,7 @@ function Home() {
                 (
                   <FlatList
                     data={filterFoods}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.foodId.toString()}
                     renderItem={({ item }) => (
                       <TouchableOpacity 
                         style={[styles.foodCard, !item.inStock && styles.disabledCard]} 

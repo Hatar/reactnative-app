@@ -83,7 +83,10 @@ const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm}) => {
           gender,
         }
         response = await dispatch(actSignUp(sendPayload))
-      } else {
+        if (response?.payload?.message === "user ajouté avec succès") {
+          setToggleForm("listTab")
+        }
+      } else if (tabName === "updateTab") {
         sendPayload ={
           userId:adminData.userId,
           firstName: firstname.value,
@@ -91,7 +94,9 @@ const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm}) => {
           email: email.value
         }
         response = await dispatch(actEditSubAdmin(sendPayload))
-        if (response?.payload?.message === "User updated successfully") setToggleForm("listTab")
+        if (response?.payload?.message === "User updated successfully") {
+          setToggleForm("listTab")
+        }
       }
       if (response?.payload?.message === "user ajouté avec succès") {
         if(role ==="Admin"){

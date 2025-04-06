@@ -1,5 +1,4 @@
 import { StyleSheet, TouchableOpacity, View, Text, Image } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Home from "../screens/Home";
@@ -12,7 +11,6 @@ import AboutUs from "../screens/AboutUs";
 import CartIcon from "../components/CartIcon";
 import InfoFood from "../screens/InfoFood";
 import Checkout from "../screens/Checkout";
-import Cart from "../screens/Cart";
 import AdminScreen from "../screens/AdminScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import aboutIcon from "../assets/information-button.png";
@@ -56,7 +54,7 @@ const Navigation = () => {
   const CustomDrawerContent = ({ navigation }) => {
     const filteredMenuItems = role === "admin"
       ? menuItems
-      : menuItems.filter(item => item.label !== "Categories" && item.label !== "Foods");
+      : menuItems.filter(item => item.label !== "Profile" && item.label !== "Categories" && item.label !== "Foods");
     const userMenuItems = [
       { label: "Sign Out", navigateTo: "Signin", icon: ICONS.SignOutIcon },
     ];
@@ -178,7 +176,6 @@ const Navigation = () => {
           component={ResetPasswordScreen}
         />
         <Stack.Screen name="Checkout" component={Checkout} />
-        <Stack.Screen name="Cart" component={Cart} />
       </Stack.Navigator>
     </>
   );

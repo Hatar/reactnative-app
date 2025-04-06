@@ -6,7 +6,7 @@ import { actGetListAdmin } from "../redux/slices/admin/adminSlice.js";
 import Buttons from "../components/Buttons.jsx";
 import { COLORS,SIZES,FONTS,ICONS } from "../constants/theme.js";
 import ModalWrapper from "../components/ModalWrapper.jsx";
-import { toggleDisplayModal } from "../redux/slices/General/generalSlice.js";
+import {setItemModalWrapper,toggleModalWrapper } from "../redux/slices/General/generalSlice";
 
 const Profile = () => {
 
@@ -24,7 +24,8 @@ const Profile = () => {
 
   const handleAdmin = (type,data) =>{
     if(type === "delete") {
-      dispatch(toggleDisplayModal({ typeModal: "DELETE_SUB_ADMIN", itemModal: data }))
+      dispatch(toggleModalWrapper(true))
+      dispatch(setItemModalWrapper({ typeModal: "DELETE_SUB_ADMIN", itemModal: data }))
     } else if (type === "edit") {
       setAdminData(data)
       setToggleForm("updateTab")

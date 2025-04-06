@@ -1,4 +1,4 @@
-import { SafeAreaView,Image,TouchableOpacity, StyleSheet, Text, View, Alert } from "react-native";
+import { SafeAreaView,Image, StyleSheet, Text, View,Keyboard, FlatList } from "react-native";
 import Buttons from "../components/Buttons";
 import TextInput from "../components/TextInput";
 import { COLORS, FONTS,ICONS,SIZES } from "../constants";
@@ -7,11 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import DropdownSelect from 'react-native-input-select';
 import { actAddFood, actEditFood, actGetFoods, toggleTabName } from "../redux/slices/food/foodSlice";
 import CustomeContent from "../components/CustomeContent";
-import { FlatList } from "react-native-gesture-handler";
 import ModalWrapper from "../components/ModalWrapper"
-import Checkbox from 'expo-checkbox';
 import EmptyContent from "../components/CustomeContent";
-import * as ImagePicker from 'expo-image-picker'
+import { isPureBase64, pickImage,convertImageToBase64 } from "../helpers";
+import { toggleModalWrapper,setItemModalWrapper } from "../redux/slices/General/generalSlice";
 
 const Foods = () => {
   const [isModalVisible,setModalVisible] = useState(false)
@@ -20,9 +19,11 @@ const Foods = () => {
   const [price,setPrice] = useState("")
   const [description,setDescription] = useState("")
   const [image,setImage] = useState(null)
-
+  const [imageBase64,setImageBase64] = useState(null)
+  const [titleRecipe,setTitleRecipe] = useState("")
+  const [recipes,setRecipes] = useState([])
   
-  const [isChecked, setChecked] = useState(false);  
+
   
   const [editFood,setEditFood] = useState(null)  
 
@@ -39,6 +40,8 @@ const Foods = () => {
   },[dispatch,foods.length])
 
 
+
+  // Actions for the modal
   const switchToAddFood = () => {
     dispatch(toggleTabName("add"))
     clearForm()
@@ -46,8 +49,8 @@ const Foods = () => {
 
 
   const handleDeleteFood = (item) =>{
-    setFoodDelete(item)
-    setModalVisible(true)
+    dispatch(toggleModalWrapper(true))
+    dispatch(setItemModalWrapper({ typeModal: "DELETE_FOOD", itemModal: item })) 
   }
 
 
@@ -57,47 +60,52 @@ const Foods = () => {
     setPrice(String(food.price))
     setDescription(food.description)
     setImage(food.imageUrl)
-    setChecked(food.inStock)
-    setImage(food.imageUrl)
+    setRecipes(food.recepies)
+    setCategory(food.categoryId)
     dispatch(toggleTabName("add"))
   } 
 
 
   const handleSaveEdit = () =>{
     if (!editFood) return;
+    let imageBase64= null
+    if (!isPureBase64(image)) {
+      imageBase64 =convertImageToBase64(image)
+    }
     const updatedFood = {
-      id: editFood.id,
       categoryId: category,
       title,
       description,
-      price,
-      imageUrl:image,
-      inStock:isChecked
+      price: Number(price),
+      imageBase64:image,
+      recepies:recipes,
+      imageBase64
     }
     dispatch(actEditFood(updatedFood))
     dispatch(toggleTabName("all"))
     clearForm()
   }
 
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4,3],
-        quality: 1
+  const handleUploadImage = async () => {
+    await pickImage({
+      resizeWidth: 150,
+      resizeHeight: 150,
+      compression: 0.1,
+      returnBase64: true,
+      onImagePicked: ({ uri, base64 }) => {
+        setImage(uri);
+        setImageBase64(base64);
+      },
     });
-    setImage(result.assets[0].uri)
-  };
-
-  const handleAddFood = async () => {
-    dispatch(
-      actAddFood({ categoryId: category, title, description, price, imageUrl:image, inStock: isChecked })
-    )
-    dispatch(toggleTabName("all"))
-    clearForm();
   }
 
+  const handleAddFood = async () => {
+    const response = await dispatch(actAddFood({ title, description, price: Number(price),categoryId: category,recepies:recipes, imageBase64 }))
+    if(response.payload.message === "Food added successfully.") {
+      await dispatch(toggleTabName("all"))
+      clearForm();
+    }
+  }
 
   const clearForm = () =>{
     setEditFood(null)
@@ -106,10 +114,26 @@ const Foods = () => {
     setPrice("")
     setDescription("")
     setImage(null)
+    setImageBase64(null)
+    setRecipes([])
+    setTitleRecipe("")
   }
 
 
+  const handleAddYourRecipe = () => {
+    if (titleRecipe.trim() !== "") {
+      setRecipes((prevRecipes) => [...prevRecipes, titleRecipe.trim()]);
+      setTitleRecipe("");
+      Keyboard.dismiss();
+    }
+  };
 
+  const handleRemoveRecipe = (indexToRemove) => {
+    setRecipes(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+
+  // Rendering the list of foods
   const renderFoodsList = () => {
     return (
       <>
@@ -117,7 +141,7 @@ const Foods = () => {
         foods && foods.length > 0 ? (
           <FlatList
             data={foods}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.foodId}
             renderItem={({ item }) => 
               <CustomeContent
                 item={item}
@@ -135,6 +159,7 @@ const Foods = () => {
       </>
     )
   }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.section_btns}>
@@ -161,11 +186,19 @@ const Foods = () => {
                   <DropdownSelect
                     placeholder="Select Category..."
                     options={categories.map(category => ({
-                      label: category.name,
-                      value: category?.id,
+                      label: category.nameCategory,
+                      value: category?.categoryId,
                     }))}
                     selectedValue={category}
                     onValueChange={(itemValue) => setCategory(itemValue)}
+                    listComponentStyles={{
+                      sectionHeaderStyle: {
+                        padding: 10,
+                        backgroundColor: 'green',
+                        color: 'white',
+                        width: '30%',
+                      },
+                    }}
                   />
                 ) 
               }
@@ -200,20 +233,38 @@ const Foods = () => {
                 customWrapperInput={styles.wrapperInput}
               />
   
-              <View style={styles.section_checkbox}>
-                <Checkbox
-                  style={styles.checkbox}
-                  color={COLORS.cardBg} 
-                  value={isChecked} 
-                  onValueChange={setChecked} 
-                /> 
-                <Text style={styles.paragraph}>{ isChecked ? "in Stock" : "out Stock" }</Text>
+              <TextInput
+                placeholder="Write your recipe..."
+                value={titleRecipe}
+                autoCapitalize="none"
+                returnKeyType="next"
+                onChangeText={setTitleRecipe}
+                onSubmitEditing={handleAddYourRecipe}
+                customWrapperInput={styles.wrapperInput}
+              />
+
+              <View>
+                <FlatList
+                  data={recipes}
+                  horizontal
+                  keyExtractor={(_, index) => index.toString()}
+                  renderItem={({ item,index }) => (
+                    <Buttons
+                      title={item}
+                      stylesText={styles.textButtonReceip}
+                      stylesButton={[styles.btns_recipes]}
+                      pressHandler={()=> handleRemoveRecipe(index)}
+                    />
+                  )}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.recipeContainer}
+                />
               </View>
               
               <View style={{marginVertical:10,flexDirection:"column",gap:10}}>
                 <Buttons
                     title={"Pick an Image"}
-                    pressHandler={pickImage}
+                    pressHandler={handleUploadImage}
                     stylesText={styles.textButton}
                     stylesButton={styles.button}
                 />
@@ -322,6 +373,29 @@ const styles = StyleSheet.create({
   checkbox: {
     marginVertical: 15,
     marginHorizontal:2
+  },
+  item: {
+    padding: 10,
+    backgroundColor: COLORS.cardBg,
+    borderRadius: 6,
+    marginVertical: 4,
+    fontSize: 16
+  },
+  recipeContainer: {
+    gap: 10,
+    marginTop: 10,
+  },
+  btns_recipes: {
+    backgroundColor: COLORS.cardBg,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
+  textButtonReceip:{
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "bold",
+    textAlign: "center",
   }
 });
 

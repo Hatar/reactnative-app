@@ -9,8 +9,16 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
   const navigation = useNavigation()
   const {categories} = useSelector((state)=> state.categories)
   const role = useSelector((state) => state.auth.role);
-  const getNameOFCategory = categories.find((category) => category.id === item?.categoryId)?.name
-
+  
+  let getNameOFCategory = "";
+  if (item && item.categoryId !== undefined && categories.length > 0) {
+    const category = categories.find((category) => {
+      return category.categoryId === item?.categoryId;
+    });
+    if (category) {
+      getNameOFCategory = category.nameCategory
+    }
+  }
 
   const renderContentArticle = () => {
       return (
@@ -60,6 +68,15 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
                   <Text style={styles.boldText}>{item?.price  ? "Price:"  : "Date:"}: </Text>
                   {item?.date || `${item?.price}$`}
                 </Text>
+
+                {item.recepies && item.recepies.length > 0 && (
+                  <Text style={styles.article_title}>
+                    <Text style={styles.boldText}>Recepies: </Text>
+                    <Text style={{ color: COLORS.cardBg }}>
+                      {item.recepies.join('  -  ')}
+                    </Text>
+                  </Text>
+                )}
               </View>
               {!isArticle && 
                 <View style={{margin:15,gap:10}}>
@@ -113,7 +130,7 @@ export const styles = StyleSheet.create({
     borderWidth:0,
     padding:0,
     marginBottom: 15,
-    height:250,
+    height:280,
     borderLeftWidth:3,
     margin:0,
     borderColor:COLORS.errors,

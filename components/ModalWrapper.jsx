@@ -2,17 +2,17 @@ import React, { useCallback } from "react";
 import { ModalContent, BottomModal } from "react-native-modals";
 import { Text, StyleSheet, View, Pressable } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteItemFromCart } from "../redux/slices/cart/cartSlice";
+import { deleteItemFromCart, setTypePayment } from "../redux/slices/cart/cartSlice";
 import { useNavigation } from "@react-navigation/native";
 import { actDeleteCategory } from "../redux/slices/category/categorySlice";
 import { actDeleteFood } from "../redux/slices/food/foodSlice";
 import actDeleteSubAdmin from "../redux/slices/admin/act/actDeleteSubAdmin";
-import { toggleDisplayModal } from "../redux/slices/General/generalSlice";
+import { toggleModalWrapper } from "../redux/slices/General/generalSlice";
+import Buttons from "./Buttons";
+import { COLORS, FONTS,SIZES } from "../constants";
 
 const ModalWrapper = () => {
-  const {isModalVisible,typeModal,itemModal} = useSelector((state) => {
-    return state.generals
-  })
+  const {isModalVisible,typeModal,itemModal,changedBehaviorModalWrapper} = useSelector((state) => state.generals)
   const dispatch = useDispatch()
   const navigation = useNavigation()
 
@@ -27,46 +27,80 @@ const ModalWrapper = () => {
         dispatch(actDeleteCategory(itemModal.categoryId));
         break;
       case "DELETE_FOOD":
-        dispatch(actDeleteFood(itemModal.id))
+        dispatch(actDeleteFood({foodId:itemModal.foodId,categoryId:itemModal.categoryId}));
         break;
       case "DELETE_SUB_ADMIN":
-          dispatch(actDeleteSubAdmin(itemModal.userId))
-          break;
+        dispatch(actDeleteSubAdmin(itemModal.userId))
+        break;
       default:
         break;
     }
-    dispatch(toggleDisplayModal())
+    dispatch(toggleModalWrapper(false))
   }, []);
 
 
   const handleCloseModal = useCallback(() => {
-    dispatch(toggleDisplayModal())
+    dispatch(toggleModalWrapper(false))
+  },[])
+
+
+  const handleMethodPayment = useCallback((typeMethod) => {
+    dispatch(setTypePayment(typeMethod))
+    dispatch(toggleModalWrapper(false))
   },[])
 
   return (
     <BottomModal
       visible={isModalVisible}
       onTouchOutside={handleCloseModal}
-      height={0.25}
+      height={changedBehaviorModalWrapper ? .40 :0.25}
       width={1}
     >
       <View style={styles.modalTitleContainer}>
-        <Text style={styles.modalTitleText}>Are you sure?</Text>
+        <Text style={styles.modalTitleText}>{ changedBehaviorModalWrapper ? "Select Method Payment" :  "Are you sure?"}</Text>
       </View>
 
       <ModalContent style={styles.modalContent}>
-        <Text style={styles.contentModal}>
-          You are about to delete <Text style={styles.itemDeleted}>{itemModal?.title || itemModal?.name || itemModal?.nameCategory || `${itemModal?.firstName}-${itemModal?.lastName}`}</Text>. This action
-          cannot be undone.
-        </Text>
-        <View style={styles.buttonContainer}>
-          <Pressable style={[styles.button, styles.cancelButton]} onPress={()=> handleCloseModal()}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </Pressable>
-          <Pressable style={[styles.button, styles.deleteButton]} onPress={()=> handleDelete()}>
-            <Text style={[styles.buttonText, styles.deleteText]}>Delete</Text>
-          </Pressable>
-        </View>
+        {
+          changedBehaviorModalWrapper ?(
+            <View style={styles.content_cart}>
+                <Buttons
+                    title="Stripe"
+                    pressHandler={() => handleMethodPayment("stripe")}
+                    stylesText={styles.textButton}
+                    stylesButton={[styles.button, { backgroundColor: COLORS.black }]}
+                />
+                <Buttons
+                    title="Paypal"
+                    pressHandler={() =>handleMethodPayment("Paypal")}
+                    stylesText={styles.textButton}
+                    stylesButton={[styles.button, { backgroundColor: COLORS.errors }]}
+                />
+                <Buttons
+                    title="Cash"
+                    pressHandler={() =>handleMethodPayment("Cash")}
+                    stylesText={styles.textButton}
+                    stylesButton={styles.button}
+                />
+            </View>
+          )  :(
+            <>
+              <Text style={styles.contentModal}>
+                You are about to delete <Text style={styles.itemDeleted}>{itemModal?.title || itemModal?.name || itemModal?.nameCategory || `${itemModal?.firstName}-${itemModal?.lastName}`}</Text>. This action
+                cannot be undone.
+              </Text>
+              <View style={styles.buttonContainer}>
+                <Pressable style={[styles.button, styles.cancelButton]} onPress={()=> handleCloseModal()}>
+                  <Text style={styles.buttonText}>Cancel</Text>
+                </Pressable>
+                <Pressable style={[styles.button, styles.deleteButton]} onPress={()=> handleDelete()}>
+                  <Text style={[styles.buttonText, styles.deleteText]}>Delete</Text>
+                </Pressable>
+              </View>
+            </>
+          )
+        }
+        
       </ModalContent>
     </BottomModal>
   );
@@ -88,15 +122,18 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     flex: 1,
-    backgroundColor: "#FFF",
-    padding: 20,
-    justifyContent: "center",
   },
   contentModal: {
     fontSize: 16,
     textAlign: "left",
     alignSelf: "flex-start",
     marginBottom: 20,
+  },
+  header_title:{
+    color:COLORS.bg,
+    fontFamily:FONTS.bold,
+    fontWeight:500,
+    fontSize:SIZES.large + 10,
   },
   itemDeleted: {
     fontWeight: "bold",
@@ -127,6 +164,11 @@ const styles = StyleSheet.create({
   deleteText: {
     color: "#FFF",
   },
+  textButton: {
+    color: COLORS.white,
+    fontFamily: FONTS.semiBold,
+    fontSize: SIZES.large,
+},
 });
 
 export default ModalWrapper;

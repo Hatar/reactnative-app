@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actAddCategory, actGetCategories, actEditCategory } from "../redux/slices/category/categorySlice";
 import EmptyContent from "../components/EmptyContent";
-import {toggleDisplayModal } from "../redux/slices/General/generalSlice";
+import {setItemModalWrapper,toggleModalWrapper } from "../redux/slices/General/generalSlice";
 const Categories = () => {
     const [category, setCategory] = useState("");
     const [editCategory,setEditCategory] = useState(null)
@@ -28,7 +28,8 @@ const Categories = () => {
 
 
     const handleDeleteCategory = (item)=>{
-        dispatch(toggleDisplayModal({ typeModal: "DELETE_CATEGORY", itemModal: item }))  
+        dispatch(toggleModalWrapper(true))
+        dispatch(setItemModalWrapper({ typeModal: "DELETE_CATEGORY", itemModal: item }))  
     }
 
     useEffect(() => {

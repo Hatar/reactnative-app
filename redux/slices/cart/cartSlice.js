@@ -12,6 +12,7 @@ const initialState = {
             quantity: 5
         }
     ],
+    typePayment:"",
     total:50
 }
 
@@ -45,11 +46,15 @@ const cartSlice = createSlice({
                 item.quantity -=1
             }
             state.total = state.items.reduce((sum,item) =>sum+item.price * item.quantity,0)
-        }
+        },
+
+        setTypePayment:(state,action) =>{
+            state.typePayment = action.payload
+        },
     }
 })
 
 
 
-export const {addItemToCart,deleteItemFromCart,increaseQuantity,decreaseQuantity} = cartSlice.actions
+export const {addItemToCart,deleteItemFromCart,increaseQuantity,decreaseQuantity,setTypePayment} = cartSlice.actions
 export default cartSlice.reducer

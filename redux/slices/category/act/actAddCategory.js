@@ -5,8 +5,8 @@ const actAddCategory = createAsyncThunk(
   "categories/actAddCategory",
   async (categoryData, { rejectWithValue }) => {
     try {
-      await request("add/category","POST",categoryData,)
-      return categoryData
+      const response = await request("add/category","POST",categoryData,)
+      return response
     } catch (error) {
       return rejectWithValue(error.message);
     }
