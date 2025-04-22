@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React,{useCallback} from "react";
 import {
   FlatList,
   Image,
@@ -17,13 +17,11 @@ import {
   decreaseQuantity,
   increaseQuantity,
 } from "../redux/slices/cart/cartSlice";
-import ModalWrapper from "./ModalWrapper.jsx";
 import actApiPayment from "../redux/slices/cart/act/actApiPayment.js";
 import { useStripe } from "@stripe/stripe-react-native";
-import { setChangedBehaviorModalWrapper } from "../redux/slices/General/generalSlice.js";
+import { setChangedBehaviorModalWrapper, toggleModalWrapper,setItemModalWrapper } from "../redux/slices/General/generalSlice.js";
+import { handleFloatTotal } from "../helpers/index.js";
 const CartItems = ({ orderList, total }) => {
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [food, setFood] = useState(null);
   const styles = getStyles(width);
 
   const dispatch = useDispatch();
@@ -35,8 +33,8 @@ const CartItems = ({ orderList, total }) => {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   const deleteItem = (item) => {
-    setModalVisible(!isModalVisible);
-    setFood(item);
+    dispatch(toggleModalWrapper(true))
+    dispatch(setItemModalWrapper({ typeModal: "DELETE_ITEM_FROM_CART", itemModal: item })) 
   };
 
   const increaseQty = useCallback(
@@ -129,13 +127,6 @@ const CartItems = ({ orderList, total }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ModalWrapper
-        isModalVisible={isModalVisible}
-        disableModalConfirm={() => setModalVisible(false)}
-        item={food}
-        typeModal={"DELETE_ITEM_FROM_CART"}
-        countItems={orderList.length}
-      />
       <FlatList
         data={orderList}
         keyExtractor={(item, index) => index.toString()}
@@ -145,7 +136,7 @@ const CartItems = ({ orderList, total }) => {
       <View style={styles.footer}>
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>Total:</Text>
-          <Text style={styles.totalAmount}>${total}</Text>
+          <Text style={styles.totalAmount}>${handleFloatTotal(total) }</Text>
         </View>
         <Buttons
           title="Confirm Order"

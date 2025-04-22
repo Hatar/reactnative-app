@@ -13,6 +13,7 @@ import { COLORS, FONTS,SIZES } from "../constants";
 
 const ModalWrapper = () => {
   const {isModalVisible,typeModal,itemModal,changedBehaviorModalWrapper} = useSelector((state) => state.generals)
+  const items  = useSelector((state) => state.carts.items)
   const dispatch = useDispatch()
   const navigation = useNavigation()
 
@@ -21,7 +22,9 @@ const ModalWrapper = () => {
     switch (typeModal) {
       case "DELETE_ITEM_FROM_CART":
         dispatch(deleteItemFromCart(itemModal))
-        if(countItems === 1)navigation.navigate('Home')
+        if (items.length === 1) {
+          navigation.navigate('Home')
+        }
         break;
       case "DELETE_CATEGORY":
         dispatch(actDeleteCategory(itemModal.categoryId));

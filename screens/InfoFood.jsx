@@ -24,51 +24,50 @@ const InfoFood =  ({route}) => {
  
   const renderFoodInformation = () => {
     const marginTop = Platform.OS === "ios" ? 10 : 20
-    const marginBottom = Platform.OS === "ios" ? 10 : 10
-    const height = Platform.OS === "ios" ? width === 576  ? 350 : 450 : width === 576  ? 400 : 470
+    const height = Platform.OS === "ios" ? width === 576  ? 350 : 370 : width === 576  ? 400 : 470
 
     return (
         <>
-      
-            <View style={{ alignItems: 'center',marginTop,marginBottom }}>
+            <View style={{ alignItems: 'center',marginTop }}>
                 <View style={styles.food_image}>
                     <Image
                         source={{uri: item.imageUrl}}
                         resizeMode='contain'
                         style={{
-                            width: SIZES.width - 24,
-                            height: '95%',
-                            borderRadius: SIZES.medium ,
+                            width: SIZES.width,
+                            height: '100%',
                         }} 
                     />
                 </View>
             </View>
-
             <View style={[styles.bottom_container, { height }]}>
                  {/* Title */}
                 <Text style={styles.name}>{item.title}</Text>
                 {/* Description */}
                 <Text style={styles.description}>{item.description}</Text>
+                
+                {item.recepies && item.recepies.length > 0 && (
+                    <View style={{flexDirection:'row',justifyContent:"space-between", alignItems:'center',gap:8,paddingVertical: SIZES.padding, paddingHorizontal: SIZES.padding * 3,}}>
+                        <Text style={styles.duration_text}>Recepies: </Text>
+                        <Text style={{
+                            fontWeight:500,
+                            fontSize:SIZES.medium,
+                            color: COLORS.bg,
+                            color: COLORS.cardBg 
+                        }}>
+                            {item.recepies.join('  -  ')}
+                        </Text>
+                    </View>
+                )}
+
                  {/* Duration */}
                 <View style={styles.row_container}>
                     <Text style={styles.duration_text}>Duration:</Text>
                     <Text style={styles.duration_text}>10 - 20 min</Text>
                 </View>
                 <View style={styles.row_container}>
-                    {/* Price */}
-                    <Text style={styles.price}>{item.price}$</Text>
-                    {/* Rating */}
-                    <View style={{ flexDirection: 'row',alignItems:'center' }}>
-                        <Image
-                            source={star}
-                            resizeMode="contain"
-                            style={{
-                                width: 23,
-                                height: 23,
-                            }} />
-                        <Text style={styles.rating}>4.5</Text>
-                    </View>
-
+                    <Text style={styles.duration_text}>Price:</Text>
+                    <Text style={styles.duration_text}>{item.price}$</Text>
                 </View>
             </View>
 

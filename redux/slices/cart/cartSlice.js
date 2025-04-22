@@ -3,17 +3,9 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = {
-    items:[
-        {
-            id: 1,
-            title: "Margherita Pizza",
-            image: "https://via.placeholder.com/150",
-            price: 10,
-            quantity: 5
-        }
-    ],
+    items:[],
+    total:0,
     typePayment:"",
-    total:50
 }
 
 const cartSlice = createSlice({
@@ -21,7 +13,7 @@ const cartSlice = createSlice({
     initialState,
     reducers:{
         addItemToCart: (state,action) =>{
-            const checkExistItem = state.items.find((item) => item.id === action.payload.id)
+            const checkExistItem = state.items.find((item) => item.foodId === action.payload.foodId)
             if(checkExistItem){
                 checkExistItem.quantity +=1
             } else {
@@ -30,18 +22,18 @@ const cartSlice = createSlice({
             state.total = state.items.reduce((sum,item) =>sum+item.price * item.quantity,0)
         },
         deleteItemFromCart:(state,action) =>{
-            state.items = state.items.filter((item) => item.id !== action.payload.id)
+            state.items = state.items.filter((item) => item.foodId !== action.payload.foodId)
             state.total = state.items.reduce((sum,item) =>sum+item.price * item.quantity,0)
         },
         increaseQuantity:(state,action) =>{
-            const item = state.items.find((item) => item.id === action.payload.id)
+            const item = state.items.find((item) => item.foodId === action.payload.foodId)
             if(item) {
                 item.quantity +=1
             }
             state.total = state.items.reduce((sum,item) =>sum+item.price * item.quantity,0)
         },
         decreaseQuantity:(state,action) =>{
-            const item = state.items.find((item) => item.id === action.payload.id)
+            const item = state.items.find((item) => item.foodId === action.payload.foodId)
             if(item && item.quantity > 1) {
                 item.quantity -=1
             }

@@ -123,7 +123,7 @@ const Navigation = () => {
             width: 300,
           },
           headerRight: () => 
-            role !=="admin" ? (
+            role =="admin" ? (
               <TouchableOpacity
                 onPress={() => {
                 }}

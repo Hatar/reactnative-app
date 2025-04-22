@@ -35,7 +35,7 @@ export const capitalize = (string) => {
 };
 
 export const isIncludeInCart = (dataStored, item) => {
-  return dataStored.some((el) => el.id === item.id);
+  return dataStored.some((el) => el.foodId === item.foodId);
 };
 
 export const isPureBase64 = (str) => {
@@ -115,4 +115,8 @@ const arrayBufferToBase64 = (buffer) => {
   const uint8Array = new Uint8Array(buffer);
   const binary = String.fromCharCode(...uint8Array);
   return Buffer.from(binary, 'binary').toString('base64');
+};
+
+export const handleFloatTotal = (num, decimals = 2) => {
+  return parseFloat(num.toFixed(decimals));
 };
