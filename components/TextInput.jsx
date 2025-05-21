@@ -1,66 +1,47 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput as RNTextInput,Image, View, Text, TouchableOpacity } from 'react-native';
-import { COLORS, ICONS, SIZES } from '../constants';
+import { TextInput as RNTextInput, Image, View, Text, TouchableOpacity } from 'react-native';
+import { ICONS } from '../constants';
 
 const TextInput = ({
   errorText,
-  customWrapperInput,
-  customInput,
   secureTextEntry,
+  className,
   ...props
 }) => {
-  
   const [secureText, setSecureText] = useState(secureTextEntry);
+  
   return (
-    <View style={StyleSheet.flatten([styles.container, customWrapperInput])}>
-      <RNTextInput
-        style={StyleSheet.flatten([styles.input, customInput])}
-        placeholderTextColor={COLORS.gray}
-        secureTextEntry={secureText ? secureTextEntry : false}
-        {...props}
-      />
-      {
-        secureTextEntry && (
-            <TouchableOpacity style={styles.iconContainer} onPress={() => setSecureText(!secureText)}>
-                <Image source={ secureText ? ICONS.eyeClose : ICONS.eye} style={styles.icon}  />
-            </TouchableOpacity>
-        )
-      }
+    <View className="w-full mb-4">
+      <View className="relative">
+        <RNTextInput
+          className={` ${
+            errorText ? 'border-red-400' : 'border-gray-300',
+            className ? className : 'w-full px-4 py-5 text-gray-800 border rounded-lg focus:border-primary'
+          }`}
+          secureTextEntry={secureText}
+          {...props}
+        />
+        
+        {secureTextEntry ? (
+          <TouchableOpacity 
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2"
+            onPress={() => setSecureText(!secureText)}
+          >
+            <Image 
+              source={secureText ? ICONS.eyeClose : ICONS.eye}  
+              className="w-5 h-5"
+            />
+          </TouchableOpacity>
+        ): null}
+      </View>
       
-      {errorText && <Text style={styles.error}>{errorText}</Text>}
+      {errorText ? (
+        <Text className="mt-1 text-sm text-red-500">
+          {errorText}
+        </Text>
+      ): null}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-    container: {
-      width: '100%',
-      position: 'relative',
-    },
-    input: {
-      backgroundColor: COLORS.white,
-      paddingHorizontal: 16,
-      paddingVertical: 20,
-      borderRadius: 10,
-      marginTop: 5,
-      paddingRight: 50,
-    },
-    iconContainer: {
-      position: 'absolute',
-      right: 16,
-      top: '50%',
-      transform: [{ translateY: -10 }],
-    },
-    icon: {
-      width: 24,
-      height: 24,
-      tintColor: COLORS.cardBg
-    },
-    error: {
-      fontSize: SIZES.small,
-      color: COLORS.error,
-      paddingTop: 4,
-    },
-  });
 
 export default TextInput;

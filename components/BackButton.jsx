@@ -1,20 +1,14 @@
 import React from 'react'
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
-import arrowBack from '../assets/arrow_back.png'
+import { TouchableOpacity } from 'react-native'
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const BackButton =({goBack,styleBackButton}) => {
+const BackButton =({goBack,color}) => {
   return (
-    <TouchableOpacity style={styleBackButton} onPress={goBack}>
-        <Image style={styles.image} source={arrowBack} />
+    <TouchableOpacity className='absolute left-1 top-4' onPress={goBack}> 
+        <Ionicons name="chevron-back-outline" size={28} color={color ? color :"black"} />
     </TouchableOpacity>
   )
 }
 
-export const styles = StyleSheet.create({
-    image: {
-        width: 24,
-        height: 24,
-    },
-})
 
 export default BackButton

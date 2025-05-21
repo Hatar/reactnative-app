@@ -1,243 +1,169 @@
-import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View, FlatList, Image, TouchableOpacity, useWindowDimensions } from "react-native";
+import { useState, useEffect } from "react";
+import {
+  SafeAreaView,
+  View,
+  Image,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { actGetCategories } from "../redux/slices/category/categorySlice";
-import Buttons from "../components/Buttons";
 import { actGetFoods } from "../redux/slices/food/foodSlice";
-import { COLORS, ICONS } from "../constants";
-import Dashboard from "./dashboard";
+import TextInput from "../components/TextInput";
+import Buttons from "../components/Buttons";
+import { ICONS } from "../constants";
 import { useNavigation } from "@react-navigation/native";
-import { addItemToCart } from "../redux/slices/cart/cartSlice";
-import { isIncludeInCart } from "../helpers";
-import EmptyContent from "../components/EmptyContent";
-import useIsAdmin from "../hooks/useIsAdmin";
-import { actGetListAdmin } from "../redux/slices/admin/adminSlice";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { truncateText } from "../helpers";
 
-function Home() {
-  const navigation = useNavigation();
-  const { categories } = useSelector((state) => state.categories);
-  const { foods } = useSelector((state) => state.foods);
-  const { items } = useSelector((state) => state.carts);
-  const [filterFoods,setFilterFoods] = useState([])
+const Home = () => {
+  const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
 
-
+  const navigation = useNavigation();
   const dispatch = useDispatch();
-  const isAdmin = useIsAdmin()
-  const {width} = useWindowDimensions()
 
+  // Redux state
+  const { categories } = useSelector((state) => state.categories);
+  const { foods } = useSelector((state) => state.foods);
 
-  useEffect (() => {
-    dispatch(actGetListAdmin())
+  const onPress = () => {
+    console.log("Search button pressed");
+  };
+
+  const handleFilterFoodByCategory = (id) => {
+    if (activeCategory === id) {
+      setActiveCategory(null);
+    } else {
+      setActiveCategory(id);
+    }
+  };
+
+  useEffect(() => {
     dispatch(actGetCategories());
     dispatch(actGetFoods());
   }, [dispatch]);
 
-
-  useEffect(()=>{
-    setFilterFoods(foods)
-  },[foods])
-
-
-
-  const handleAddToCart = (item) => {
-    if (!isIncludeInCart(items, item)) {
-      dispatch(addItemToCart(item));
-    }
-  };
-
-
-  const handleFilterFoodByCategory = (idCategory) => {
-    if (activeCategory === idCategory) {
-      setActiveCategory(null)
-      setFilterFoods(foods)
-    } else {
-      setActiveCategory(idCategory);
-      setFilterFoods(foods.filter(food => food.categoryId === idCategory));
-    }
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
-      { isAdmin ? (
-        <Dashboard />
-      ) : (
-        <>
-        {categories.length > 0 && <Text style={styles.title}>Categories</Text> } 
+    <SafeAreaView className="flex-1 bg-bgLight">
+      {/* Header */}
+      <View className="flex-row justify-between items-center mx-4 mb-10 mt-5">
         <View>
-          <FlatList
-            data={categories}
-            horizontal
-            keyExtractor={(item) => item.categoryId}
-            renderItem={({ item }) => (
-              <Buttons
-                title={item.nameCategory}
-                stylesText={styles.textButton}
-                stylesButton={[styles.categoryButton,activeCategory === item.categoryId && styles.activeCategoryBtn]}
-                pressHandler={()=> handleFilterFoodByCategory(item.id)}
-              />
-            )}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoryContainer}
+          <Ionicons name="menu" size={35} />;
+        </View>
+        <Pressable className="bg-primary w-12 h-12 rounded-md justify-center items-center" onPress={() => navigation.navigate("Profile")}>
+          <Ionicons name="person" size={30} />;
+        </Pressable>
+      </View>
+
+      {/* Title */}
+      <View className="w-80 mx-4 mb-10">
+        <Text className="font-bold text-3xl text-black">Order Fresh &</Text>
+        <View className="flex-row items-center">
+          <Text className="font-bold text-3xl text-black mr-2">
+            Tasty Food Now!
+          </Text>
+          <Image className="w-8 h-8" source={ICONS.fire} />
+        </View>
+      </View>
+
+      {/* Search */}
+      <View className="px-4 flex-row w-full gap-3 mb-6">
+        <View className="flex-1 max-h-20">
+          <TextInput
+            placeholder={"Search for food"}
+            value={search}
+            autoCapitalize="none"
+            onChangeText={(text) => setSearch(text)}
+            className="w-full h-full px-4 bg-white rounded-lg shadow-sm shadow-black/10 text-gray-800"
           />
         </View>
-        {filterFoods.length > 0 && <Text style={styles.title}>Foods</Text>}
-        <View style={{flex:1}}>
-            {
-              filterFoods && filterFoods.length > 0 ? 
-                (
-                  <FlatList
-                    data={filterFoods}
-                    keyExtractor={(item) => item.foodId.toString()}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity 
-                        style={[styles.foodCard, !item.inStock && styles.disabledCard]} 
-                        onPress={() => navigation.navigate("InfoFood", { item })}
-                        disabled={!item.inStock}
-                      >
-                        <View style={styles.imageContainer}>
-                          <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
-                          {!item.inStock && (
-                            <View style={styles.outStockOverlay}>
-                              <Text style={styles.outStockText}>Out of Stock</Text>
-                            </View>
-                          )}
-                        </View>
-                        <View style={styles.foodInfo}>
-                          <Text style={styles.foodName} numberOfLines={1} ellipsizeMode="tail">
-                            {item.title}
-                          </Text>
-                          <Text style={styles.foodPrice}>{item.price}$</Text>
-                          <View style={styles.addToCartContainer}>
-                            <Buttons
-                              title="Add to Cart"
-                              pressHandler={() => item.inStock && handleAddToCart(item)}
-                              stylesText={styles.textButton}
-                              stylesButton={[styles.addToCartButton, !item.inStock && styles.disabledButton]}
-                              disabled={!item.inStock}
-                            />
-                          </View>
-                        </View>
-                      </TouchableOpacity>
-                    )}
-                    numColumns={width === 576 ? 3 : 2}
-                    columnWrapperStyle={styles.row}
-                    showsVerticalScrollIndicator={false}
+        <Buttons
+          Icon={<Ionicons name={"filter-outline"} size={25} color={"white"} /> }
+          pressHandler={onPress}
+          stylesButton="w-16 h-16 bg-primary rounded-lg justify-center items-center"
+          stylesText="text-xl text-black font-bold"
+        />
+      </View>
+
+      {/* Categories */}
+      <View className="mx-4 mt-4">
+        <Text className="font-bold text-2xl text-black mb-4">Categories</Text>
+        <FlatList
+          data={categories || []}
+          horizontal
+          keyExtractor={(item) => item?.categoryId}
+          renderItem={({ item }) => (
+            <Buttons
+              title={item.nameCategory}
+              pressHandler={() => handleFilterFoodByCategory(item.id)}
+              stylesButton={
+                "w-24 h-10 bg-primary rounded-lg justify-center items-center"
+              }
+              stylesText="text-xl text-black font-semibold"
+            />
+          )}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryContainer}
+        />
+      </View>
+
+      {/* Foods */}
+      <View className="mx-4 mt-4 flex-1">
+        <FlatList
+          data={foods || []}
+          keyExtractor={(item) => item.foodId.toString()}
+          numColumns={2}
+          columnWrapperStyle={{ gap: 10 }}
+          contentContainerStyle={{ gap: 10 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              className="flex-1 bg-white justify-between rounded-lg p-4 min-h-72"
+              style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3}}
+              onPress={() => navigation.navigate("InfoFood", { item })}
+              // disabled={!item.inStock}
+            >
+              <View className="items-center">
+                <View className="relative">
+                  <Image
+                    source={{ uri: item.imageUrl }}
+                    className="w-36 h-36 rounded-full border-6 border-primary bg-slate-400 shadow-lg"
                   />
-                )
-              : <EmptyContent title={"Foods"} image={ICONS.NoFood} />
-            }
-        </View>
-      </>
-      )}
+                  {!item.inStock ? (
+                    <View className="absolute inset-0 bg-black/50 rounded-full justify-center items-center">
+                      <Text className="text-white font-bold">Out of Stock</Text>
+                    </View>
+                  ): null}
+                </View>
+              </View>
+
+              {/* Centered Text Content */}
+              <View className="items-center gap-2">
+                <Text className="text-xl font-bold text-center text-darkText">
+                  {item.title}
+                </Text>
+                <Text className="text-md text-center text-darkText">
+                  {truncateText(item.description,15) }
+                </Text>
+                <Text className="text-2xl text-primary font-medium">
+                  $ {Math.trunc(item.price)}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    margin: 10,
-    flex: 1,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 10,
-    marginBottom: 10,
-  },
-  disabledCard: {
-    backgroundColor: "#d3d3d3",
-  },
-  imageContainer: {
-    position: "relative",
-  },
-  outStockOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  outStockText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+export const styles = StyleSheet.create({
   categoryContainer: {
     gap: 10,
     paddingBottom: 10,
-  },
-  categoryButton: {
-    backgroundColor: COLORS.cardBg,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-  },
-  activeCategoryBtn:{
-    backgroundColor: COLORS.errors,
-  },
-  textButton: {
-    color: "#FFF",
-    fontSize: 14,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  foodCard: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    margin: 5,
-    overflow: "hidden",
-  },
-  foodImage: {
-    width: "100%",
-    height: 120,
-    resizeMode: "cover",
-    aspectRatio: 1.5,
-  },
-  foodInfo: {
-    padding: 10,
-    alignItems: "center",
-  },
-  foodName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  foodPrice: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
-    marginTop: 5,
-  },
-  addToCartButton: {
-    backgroundColor: COLORS.cardBg,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    alignSelf: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-  },
-  disabledButton: {
-    backgroundColor: "#999",
-  },
-  addToCartContainer: {
-    marginTop: 10,
-  },
-  noCategoriesContainer: {
-    alignItems: "center",
-    marginTop: 20,
   },
 });
 

@@ -1,4 +1,4 @@
-import React,{useCallback} from "react";
+import {useCallback} from "react";
 import {
   FlatList,
   Image,
@@ -141,8 +141,8 @@ const CartItems = ({ orderList, total }) => {
         <Buttons
           title="Confirm Order"
           pressHandler={() => onCheckout()}
-          stylesText={styles.buttonText}
-          stylesButton={styles.button}
+          stylesButton="w-full h-14 bg-primary rounded-lg justify-center items-center"
+          stylesText="text-xl text-black font-bold"
         />
       </View>
     </SafeAreaView>

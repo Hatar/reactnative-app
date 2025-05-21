@@ -1,10 +1,9 @@
-import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { COLORS, FONTS, ICONS, SIZES } from '../constants'
 import { useNavigation } from '@react-navigation/native'
 import { useSelector } from 'react-redux'
 import Buttons from './Buttons'
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,handleDelete,handleEditFood}) => {
   const navigation = useNavigation()
   const {categories} = useSelector((state)=> state.categories)
@@ -27,12 +26,12 @@ const CustomeContent = ({item,isLastItem,isEnableChangeContent,isHome,isArticle,
               role ==="admin" && !isArticle && (
                 <View style={styles.actionsBtn}>
                   <Buttons
-                      Icon={ICONS.EditIcon}
+                      Icon={<Ionicons name={"pencil-outline"} size={35} />} 
                       pressHandler={handleEditFood}
                       stylesButton={styles.button}
                   />
                   <Buttons
-                      Icon={ICONS.deleteIcon}
+                      Icon={<Ionicons name={"trash-outline"} size={35} />}
                       pressHandler={handleDelete}
                       stylesButton={styles.button}
                   />

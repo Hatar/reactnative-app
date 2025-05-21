@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { actAddCategory, actGetCategories, actEditCategory } from "../redux/slices/category/categorySlice";
 import EmptyContent from "../components/EmptyContent";
 import {setItemModalWrapper,toggleModalWrapper } from "../redux/slices/General/generalSlice";
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const Categories = () => {
     const [category, setCategory] = useState("");
     const [editCategory,setEditCategory] = useState(null)
@@ -55,13 +56,13 @@ const Categories = () => {
             <Text style={styles.category_name}>{item.nameCategory}</Text>
             <View style={styles.btns}>
                 <Buttons
-                    Icon={ICONS.EditIcon}
+                    Icon={<Ionicons name={"pencil-outline"} size={35} />} 
                     pressHandler={() => haneleEditCategory(item)}
                     stylesText={styles.textButton}
                     stylesButton={styles.button}
                 />
                 <Buttons
-                    Icon={ICONS.deleteIcon}
+                    Icon={<Ionicons name={"trash-outline"} size={35} />}
                     pressHandler={() => handleDeleteCategory(item)}
                     stylesText={styles.textButton}
                     stylesButton={styles.button}
@@ -81,11 +82,10 @@ const Categories = () => {
                     autoCapitalize="none"
                     returnKeyType="next"
                     onChangeText={(text) => setCategory(text)}
-                    customInput={styles.input}
                 />
                 <View style={styles.buttonContainer}>
                     <Buttons
-                        Icon={ICONS.closeIcon}
+                        Icon={<Ionicons name={"close-circle-outline"} size={35} />}
                         title={"Cancel"}
                         pressHandler={handleCancel}
                         stylesText={styles.cancelTextButton}
@@ -94,7 +94,7 @@ const Categories = () => {
                     {
                     editCategory ? (
                         <Buttons
-                            Icon={ICONS.EditIcon}
+                            Icon={<Ionicons name={"pencil-outline"} size={35} />} 
                             title={"Edit"}
                             pressHandler={handleSaveEdit}
                             stylesText={styles.textButton}
@@ -103,7 +103,7 @@ const Categories = () => {
                     ) : (
                         <Buttons
                             title={"Add"}
-                            Icon={ICONS.AddIcon}
+                            Icon={<Ionicons name={"add-circle-outline"} size={35} />} 
                             pressHandler={handleAddCategory}
                             stylesText={styles.textButton}
                             stylesButton={styles.button}

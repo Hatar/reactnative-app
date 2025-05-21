@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actGetListAdmin } from "../redux/slices/admin/adminSlice.js";
 import Buttons from "../components/Buttons.jsx";
-import { COLORS,SIZES,FONTS,ICONS } from "../constants/theme.js";
+import { COLORS,SIZES,FONTS } from "../constants/theme.js";
 import ModalWrapper from "../components/ModalWrapper.jsx";
 import {setItemModalWrapper,toggleModalWrapper } from "../redux/slices/General/generalSlice";
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const Profile = () => {
 
   const [toggleForm,setToggleForm] = useState("listTab")
@@ -50,13 +50,13 @@ const Profile = () => {
           <Text style={styles.category_name}>{item.gender}, {`${item.firstName}-${item.lastName}` }</Text>
           <View style={styles.btns}>
               <Buttons
-                  Icon={ICONS.EditIcon}
+                  Icon={<Ionicons name={"pencil-outline"} size={35} />} 
                   pressHandler={() => handleAdmin("edit",item)}
                   stylesText={styles.textButton}
                   stylesButton={styles.btn_action}
               />
               <Buttons
-                  Icon={ICONS.deleteIcon}
+                  Icon={<Ionicons name={"trash-outline"} size={35} />} 
                   pressHandler={() => handleAdmin("delete",item)}
                   stylesText={styles.textButton}
                   stylesButton={styles.btn_action}
@@ -78,13 +78,13 @@ const Profile = () => {
 
         <View className="flex-row justify-start">
           <Buttons
-            Icon={ICONS.AddIcon}
+            Icon={<Ionicons name={"add-circle-outline"} size={35} />} 
             pressHandler={()=> handleToggleTabSelected("createTab")}
             stylesText={styles.textButton}
             stylesButton={styles.button}
           />
           <Buttons
-            Icon={ICONS.listIcon}
+            // Icon={ICONS.listIcon}
             pressHandler={()=> handleToggleTabSelected("listTab")}
             stylesText={styles.textButton}
             stylesButton={styles.button}

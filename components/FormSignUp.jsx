@@ -208,8 +208,8 @@ const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm}) => {
         <Buttons
           title={role === "Admin" && tabName == "updateTab" ? "Update Admin" : role !== "Admin" ? "Sign Up" : "Admin Admin" }
           pressHandler={onSignUpPressed}
-          stylesText={styles.textButton}
-          stylesButton={styles.button}
+          stylesButton="w-full h-14 bg-primary rounded-lg justify-center items-center"
+          stylesText="text-xl text-black font-bold"
         />
       )}
     </>

@@ -1,176 +1,131 @@
-import React from 'react'
-import { Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
-import { COLORS, FONTS, SIZES } from '../constants'
-import Buttons from '../components/Buttons'
-import star from '../assets/star.png'
-import Header from '../components/Header'
-import { Platform } from 'react-native'
-import { addItemToCart } from '../redux/slices/cart/cartSlice'
-import { useDispatch, useSelector } from 'react-redux'
-import { isIncludeInCart } from '../helpers'
+import {
+  Image,
+  SafeAreaView,
+  Text,
+  View,
+  FlatList
+} from "react-native";
+import { addItemToCart } from "../redux/slices/cart/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { isIncludeInCart } from "../helpers";
+import BackButton from "../components/BackButton";
+import { useNavigation } from "@react-navigation/native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import ButtonHandleQuantity from "../components/ButtonHandleQuantity";
+import Buttons from "../components/Buttons";
 
-const InfoFood =  ({route}) => {
-  const {item} = route.params
-  const {items} = useSelector((state)=>state.carts)
+const InfoFood = ({ route }) => {
+
+
+  // REDUX STATE
+  const { item } = route.params;
+  const { items } = useSelector((state) => state.carts);
+  
+
+  // ACTION
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
-  const {width} = useWindowDimensions()
 
+  // HANDLERS
   const addToCart = () => {
-    if(!isIncludeInCart(items,item)) {
-        dispatch(addItemToCart(item))
+    if (!isIncludeInCart(items, item)) {
+      dispatch(addItemToCart(item));
     }
-  }
- 
+  };
+
   const renderFoodInformation = () => {
-    const marginTop = Platform.OS === "ios" ? 10 : 20
-    const height = Platform.OS === "ios" ? width === 576  ? 350 : 370 : width === 576  ? 400 : 470
-
+    const height = 550;
     return (
-        <>
-            <View style={{ alignItems: 'center',marginTop }}>
-                <View style={styles.food_image}>
-                    <Image
-                        source={{uri: item.imageUrl}}
-                        resizeMode='contain'
-                        style={{
-                            width: SIZES.width,
-                            height: '100%',
-                        }} 
-                    />
-                </View>
-            </View>
-            <View style={[styles.bottom_container, { height }]}>
-                 {/* Title */}
-                <Text style={styles.name}>{item.title}</Text>
-                {/* Description */}
-                <Text style={styles.description}>{item.description}</Text>
-                
-                {item.recepies && item.recepies.length > 0 && (
-                    <View style={{flexDirection:'row',justifyContent:"space-between", alignItems:'center',gap:8,paddingVertical: SIZES.padding, paddingHorizontal: SIZES.padding * 3,}}>
-                        <Text style={styles.duration_text}>Recepies: </Text>
-                        <Text style={{
-                            fontWeight:500,
-                            fontSize:SIZES.medium,
-                            color: COLORS.bg,
-                            color: COLORS.cardBg 
-                        }}>
-                            {item.recepies.join('  -  ')}
-                        </Text>
-                    </View>
-                )}
+      <>
+        <Image
+          source={{ uri: item.imageUrl }}
+          className="w-72 h-72 rounded-full justify-center items-center self-center mt-8"
+        />
 
-                 {/* Duration */}
-                <View style={styles.row_container}>
-                    <Text style={styles.duration_text}>Duration:</Text>
-                    <Text style={styles.duration_text}>10 - 20 min</Text>
-                </View>
-                <View style={styles.row_container}>
-                    <Text style={styles.duration_text}>Price:</Text>
-                    <Text style={styles.duration_text}>{item.price}$</Text>
-                </View>
-            </View>
+        <View className="absolute bottom-0 left-0 right-0 bg-white rounded-tr-[50px] rounded-tl-[50px] shadow-lg h-[550px] px-9">
+          {/* Title */}
+          <Text className="text-3xl text-center font-bold mt-8 mb-3">
+            {item.title}
+          </Text>
 
-            {/* Add to Cart Button */}
-            <View style={{ margin: 10 * 2, marginTop: Platform.OS === "ios" ? 0: width === 576  ? -15 : 35 }}>
-                <Buttons
-                    title="Add to Cart"
-                    pressHandler={() =>addToCart()}
-                    stylesText={styles.textButton}
-                    stylesButton={styles.button}
-                />
+          {/* <View className="d-flex flex-row justify-center items-center self-center gap-12 mb-10">
+            <View className="flex-row justify-center items-center gap-2 mt-4">
+              <Ionicons name="timer-outline" size={25} color={"#3288e7"} />
+              <Text className="font-semibold text-md text-darkText">
+                10 - 20 min
+              </Text>
             </View>
+            <View className="flex-row justify-center items-center gap-2 mt-4">
+              <Ionicons name="star-outline" size={25} color={"#f9c32d"} />;
+              <Text className="font-semibold text-md text-darkText">4.5</Text>
+            </View>
+            <View className="flex-row justify-center items-center gap-2 mt-4">
+              <Ionicons name="flame-outline" size={25} color={"red"} />;
+              <Text className="font-semibold text-md text-darkText">
+                {item.price}$
+              </Text>
+            </View>
+          </View> */}
 
-        </>
-    )
-  }
+          <View className="d-flex flex-row justify-center items-center self-center gap-28 mb-5">
+            <View className="flex-row justify-center items-center">
+              <Text className="font-bold text-4xl text-darkText">
+                ${item.price}
+              </Text>
+            </View>
+            <ButtonHandleQuantity item={item} />
+          </View>
+
+          <View className="mb-4">
+            <Text className="font-semibold text-2xl text-darkText mb-5">
+              Ingredients
+            </Text>
+            <FlatList
+              data={item.recepies}
+              keyExtractor={(_, index) => index.toString()}
+              horizontal
+              ItemSeparatorComponent={() => <View className="w-4 mb-5" />}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item: receip }) => (
+                <View className="bg-bgLight h-24 w-24 p-5 rounded-t-3xl rounded-b-3xl justify-center items-center">
+                  <Ionicons name="egg-outline" size={25} color="red" />
+                  <Text className="font-semibold text-md text-darkText mt-2">
+                    {receip}
+                  </Text>
+                </View>
+              )}
+            />
+          </View>
+
+
+          <View className="mb-20">
+            <Text className="font-semibold text-2xl text-darkText mb-2">Description</Text>
+            <Text className="font-normal text-md text-darkText">{item.description}</Text>
+          </View>
+
+          <Buttons
+            title="Add to Cart"
+            pressHandler={() =>addToCart()}
+            stylesButton="w-full h-14 bg-primary rounded-lg justify-center items-center"
+            stylesText="text-xl text-black font-bold"
+          />
+        </View>
+      </>
+    );
+  };
   return (
-    
-    <SafeAreaView style={styles.container}>
-        <Header title={item?.title} isEnableIcon={true}/>
-        {renderFoodInformation()}
+    <SafeAreaView className="flex-1 bg-primary">
+      <View className="flex flex-row justify-between items-center w-full  gap-2">
+        <View className="-top-8">
+          <BackButton goBack={() => navigation.goBack()} color="white" />
+        </View>
+        <View className="mr-3">
+          <Ionicons name="heart-outline" size={35} color="white" />
+        </View>
+      </View>
+      {renderFoodInformation()}
     </SafeAreaView>
-  )
-}
-
-
-export const  styles = StyleSheet.create({
-    container:{
-        paddingTop: 15,
-        flex:1,
-    },
-    food_image: {
-        height: SIZES.height * 0.30,
-        marginTop: 16,
-        paddingBottom: 20,
-    },
-    bottom_container: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        elevation: 6,
-        backgroundColor: COLORS.white,
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
-        shadowOpacity: 0.1,
-        height:450
-    },
-    name: {
-        textAlign: 'center',
-        fontFamily:FONTS.semiBold,
-        fontSize:SIZES.xLarge,
-        paddingVertical: SIZES.padding * 1,
-        marginHorizontal: SIZES.padding * 3,
-        borderBottomColor: COLORS.gray,
-        borderBottomWidth: 1
-    },
-    description: {
-        fontFamily:FONTS.semiBold,
-        fontSize:SIZES.medium,
-        letterSpacing:0.5,
-        lineHeight:25,
-        paddingVertical: SIZES.padding,
-        marginHorizontal: SIZES.padding * 3,
-        color: COLORS.bg,
-        borderBottomColor: COLORS.gray,
-        borderBottomWidth: 1
-    },
-    row_container: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',    
-        alignItems:'center',
-        paddingVertical: SIZES.padding,
-        paddingHorizontal: SIZES.padding * 3,
-    },
-    price: {
-        fontFamily:FONTS.bold,
-        fontSize:25
-    },
-    rating: {
-        fontSize:SIZES.large
-    },
-    duration_text: {
-        fontFamily:FONTS.bold,
-        fontSize:SIZES.large,
-        color: COLORS.bg
-    },
-    button: {
-        backgroundColor: COLORS.bg,
-        padding: SIZES.small + 4,
-        alignItems: "center",
-        borderRadius: SIZES.medium,
-        marginVertical:10,
-        top: 350,
-        right: 0,
-        left:0
-    },
-    textButton: {
-        color: COLORS.white,
-        fontFamily: FONTS.semiBold,
-        fontSize: SIZES.large,
-    },
-
-})
-
-export default InfoFood
+  );
+};
+export default InfoFood;

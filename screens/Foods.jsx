@@ -209,8 +209,6 @@ const Foods = () => {
                 autoCapitalize="none"
                 returnKeyType="next"
                 onChangeText={(text) => setTitle(text)}
-                customInput={styles.input}
-                customWrapperInput={styles.wrapperInput}
               />
     
               <TextInput
@@ -219,8 +217,6 @@ const Foods = () => {
                 autoCapitalize="none"
                 returnKeyType="next"
                 onChangeText={(text) => setDescription(text)}
-                customInput={styles.input}
-                customWrapperInput={styles.wrapperInput}
               />
     
               <TextInput
@@ -229,8 +225,6 @@ const Foods = () => {
                 autoCapitalize="none"
                 returnKeyType="next"
                 onChangeText={(text) => setPrice(text)}
-                customInput={styles.input}
-                customWrapperInput={styles.wrapperInput}
               />
   
               <TextInput
@@ -240,7 +234,6 @@ const Foods = () => {
                 returnKeyType="next"
                 onChangeText={setTitleRecipe}
                 onSubmitEditing={handleAddYourRecipe}
-                customWrapperInput={styles.wrapperInput}
               />
 
               <View>

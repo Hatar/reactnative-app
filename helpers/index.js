@@ -1,7 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { Alert } from "react-native";
-import * as FileSystem from 'expo-file-system';
 
 export function validationOtherFields(key, name) {
   if (!name.trim()) return key + " can't be empty.";
@@ -120,3 +119,8 @@ const arrayBufferToBase64 = (buffer) => {
 export const handleFloatTotal = (num, decimals = 2) => {
   return parseFloat(num.toFixed(decimals));
 };
+
+
+export const truncateText = (str,max) =>{
+  return str.slice(0,max) + "..."
+}

@@ -1,48 +1,42 @@
-import React from 'react'
-import { StyleSheet,View,Image,Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native';
 
-const Buttons =({key,pressHandler,title,stylesText,Icon,stylesButton}) => {
-  const RenderContentButton = () => {
-    if (Icon && title) {
-      return (
-        <View style={styles.contentWrapper}>
-          <Image
-            source={Icon}
-            resizeMode="contain"
-            style={styles.icon}
-          />
-          <Text style={stylesText}>{title}</Text>
-        </View>
-      )
-    } else if (Icon) {
-      return (
-        <Image
-          source={Icon}
-          resizeMode="contain"
-          style={styles.icon}
-        />
-      )
-    } else {
-      return <Text style={stylesText}>{title}</Text>
-    }
-  }  
+const Buttons = ({ 
+  pressHandler, 
+  title, 
+  stylesText = '', 
+  Icon, 
+  stylesButton = '',
+  disabled = false,
+  testID = 'button',
+  iconPosition = 'left'
+}) => {
   return (
-    <TouchableOpacity key={key} style={stylesButton} onPress={pressHandler}>
-        <RenderContentButton />
+    <TouchableOpacity 
+      className={`flex-row justify-center items-center ${stylesButton}`}
+      onPress={pressHandler}
+      disabled={disabled}
+      activeOpacity={0.7}
+      testID={testID}
+    >
+      {iconPosition === 'left' && Icon ? (
+        <View className="text-center">
+          {typeof Icon === 'function' ? <Icon /> : Icon}
+        </View>
+      ): null}
+      
+      {title ? (
+        <Text className={stylesText}>
+          {title}
+        </Text>
+      ) : null}
+      
+      {iconPosition === 'right' && Icon ? (
+        <View className="text-center">
+          {typeof Icon === 'function' ? <Icon /> : Icon}
+        </View>
+      ) : null}
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-const styles = StyleSheet.create({
-  contentWrapper: {
-    flexDirection: "row", // Arrange icon & text in a row
-    alignItems: "center", // Align them vertically
-    gap: 8, // Add spacing between icon & text
-  },
-  icon: {
-    width: 25,
-    height: 25,
-  },
-});
-
-export default Buttons
+export default Buttons;
