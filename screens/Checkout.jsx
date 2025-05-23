@@ -1,81 +1,278 @@
-import { SafeAreaView, View, Text, Image } from "react-native";
+import { SafeAreaView, View, Text, Image, TouchableOpacity, FlatList, Alert } from "react-native";
 import BackButton from "../components/BackButton";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import ButtonHandleQuantity from "../components/ButtonHandleQuantity";
+import { useNavigation } from "@react-navigation/native";
+import { useSelector, useDispatch } from "react-redux";
+import { increaseQuantity, decreaseQuantity, setTypePayment, clearCart } from "../redux/slices/cart/cartSlice";
+import ModalWrapper from "../components/ModalWrapper"
+import { toggleModalWrapper, setChangedBehaviorModalWrapper, setItemModalWrapper } from "../redux/slices/General/generalSlice";
+import actApiPayment from "../redux/slices/cart/act/actApiPayment.js";
+import { useStripe } from "@stripe/stripe-react-native";
+import { useState, useCallback, useEffect } from "react";
 
 const Checkout = () => {
-  return (
-    <SafeAreaView className="flex-1 bg-bgLight">
-      <View className="mb-10 mt-5">
-        <BackButton goBack={() => navigation.goBack()} color="black" />
-      </View>
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { items, total, typePayment } = useSelector((state) => state.carts);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const { typeModal } = useSelector((state) => state.generals);
+  const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const [paymentSheetInitialized, setPaymentSheetInitialized] = useState(false);
 
-      <View className="mx-3 mt-8 mb-8">
-        <Text className="text-2xl font-semiBold text-darkText">Checkout</Text>
-      </View>
+  const handleDeleteItem = (item) => {
+    dispatch(toggleModalWrapper(true))
+  }
 
-      <View className="ml-5 d-flex flex-row justify-start items-center gap-5 mb-7">
-        <View className="w-16 h-16 rounded-full bg-white justify-center items-center self-center">
-          <Ionicons name="navigate-outline" size={35} color="#f9c32d" />;
-        </View>
-        <View className="d-flex gap-2 w-full">
-          <Text className="text-md font-semiBold text-darkText">
-            Delivery Adress
-          </Text>
-          <Text className="text-md font-bold text-darkText">
-            Downtown City,California USA
-          </Text>
-        </View>
-      </View>
+  const resetPaymentState = useCallback(() => {
+    setPaymentSheetInitialized(false);
+    setIsPaymentPending(false);
+    dispatch(setTypePayment(null));
+    dispatch(setItemModalWrapper(null));
+    dispatch(setChangedBehaviorModalWrapper(false));
+    dispatch(clearCart());
+  }, [dispatch]);
 
-      {/* <View className="mx-4 bg-white h-40 rounded-3xl p-5">
-            <View className="d-flex flex-row gap-8">
-              <View>
-                <Text>image</Text>
-              </View>
-              <View>
-                <Text>title foood</Text>
-                <Text>description foods </Text>
-                <View className="d-flex flex-row justify-between gap-3">
-                    <Text>$30</Text>
-                    <ButtonHandleQuantity/>
-                </View>
-              </View>
+  const initializeStripeSheet = async () => {
+    try {
+      const response = await dispatch(
+        actApiPayment({
+          amount: Math.floor(total * 100),
+          serverNode: true,
+        })
+      );
+
+      if (!response.payload || response.error) {
+        throw new Error(response.error || "Failed to create payment intent");
+      }
+
+      const { error } = await initPaymentSheet({
+        paymentIntentClientSecret: response.payload.paymentIntent,
+        merchantDisplayName: "EggsXpress",
+        returnURL: "your-app://stripe-redirect",
+        defaultBillingDetails: {
+          name: "Amine Hatar",
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setPaymentSheetInitialized(true);
+      return true;
+    } catch (error) {
+      console.error("Payment initialization error:", error);
+      return false;
+    }
+  };
+
+  const handleStripePayment = async () => {
+    try {
+      if (!paymentSheetInitialized) {
+        const initialized = await initializeStripeSheet();
+        if (!initialized) {
+          throw new Error("Failed to initialize payment");
+        }
+      }
+
+      const { error } = await presentPaymentSheet();
+      
+      if (error) {
+        if (error.code === 'Canceled') {
+          setIsPaymentPending(false);
+          return false;
+        }
+        throw new Error(error.message);
+      }
+
+      return true;
+    } catch (error) {
+      Alert.alert("Payment Error", error.message);
+      return false;
+    }
+  };
+
+  const handlePayPal = async () => {
+    Alert.alert("PayPal Payment", "PayPal payment is not implemented yet.");
+    return false;
+  };
+
+  const handleCashPayment = async () => {
+    Alert.alert("Cash Payment", "Cash payment is not implemented yet.");
+    return false;
+  };
+
+  const processPayment = async (selectedPaymentType) => {
+    if (isPaymentPending) return;
+    setIsPaymentPending(true);
+
+    try {
+      let success = false;
+      
+      switch(selectedPaymentType.toLowerCase()) {
+        case 'stripe':
+          success = await handleStripePayment();
+          break;
+        case 'paypal':
+          success = await handlePayPal();
+          break;
+        case 'cash':
+          success = await handleCashPayment();
+          break;
+        default:
+          throw new Error("Invalid payment method");
+      }
+
+      if (success) {
+        resetPaymentState();
+        Alert.alert(
+          "Payment Successful",
+          "Your order has been placed successfully!",
+          [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate("MainTabs")
+            }
+          ]
+        );
+      } else {
+        dispatch(setTypePayment(null));
+        setIsPaymentPending(false);
+        setPaymentSheetInitialized(false);
+      }
+    } catch (error) {
+      resetPaymentState();
+      Alert.alert("Payment Error", error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (typePayment && typeModal === "PAYMENT_METHOD" && !isPaymentPending) {
+      processPayment(typePayment);
+    }
+  }, [typePayment, typeModal, isPaymentPending]);
+
+  const handlePayment = useCallback(() => {
+    if (isPaymentPending) return;
+    
+    dispatch(toggleModalWrapper(true));
+    dispatch(setChangedBehaviorModalWrapper(true));
+    dispatch(setItemModalWrapper({ 
+      typeModal: "PAYMENT_METHOD", 
+      itemModal: { total: finalTotal }
+    }));
+  }, [isPaymentPending, finalTotal]);
+
+  const deliveryFee = items.length > 0 ? 4.99 : 0;
+  const finalTotal = total + deliveryFee;
+
+  const renderCartItem = ({ item }) => (
+    <View className="px-4 mb-4">
+      <View className="bg-white shadow-xl shadow-gray-300/40 rounded-3xl p-6 relative overflow-hidden">
+        <TouchableOpacity 
+          className="absolute right-0 top-0 bg-[#f9c32d] w-14 h-14 rounded-bl-3xl justify-center items-center shadow-lg shadow-yellow-400/50"
+          onPress={() => handleDeleteItem(item)}
+        >
+          <Ionicons name="trash-outline" size={20} color="white" />
+        </TouchableOpacity>
+        
+        <View className="flex-row items-center gap-5">
+          <View className="relative">
+            <View className="w-32 h-32 rounded-2xl overflow-hidden border-2 border-gray-50 shadow-lg shadow-yellow-400/50">
+              <Image
+                source={{ uri: item.imageUrl }}
+                className="w-full h-full"
+                resizeMode="cover"
+              />
             </View>
-        </View> */}
-
-      <View className="mx-4 bg-white shadow-lg shadow-gray-300 rounded-l-full rounded-r-2xl rounded-br-2xl py-2">
-        <View className="flex flex-row gap-4">
-          {/* Image placeholder - replace with your Image component */}
-            <Image
-              source={{
-                uri: "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dWRvbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60",
-              }}
-              className="w-48 h-48 rounded-full -left-1"
-              resizeMode="cover"
-            />
+            <View className="absolute -inset-0.5 bg-yellow-400/20 rounded-2xl blur-sm -z-10" />
+          </View>
 
           <View className="flex-1">
-            {/* Food title and description */}
-            <Text className="text-lg font-bold text-gray-900">
-              Beef Udon Soup
-            </Text>
-            <Text className="text-sm text-gray-500 mt-1">
-              Thai-style noodles in a spicy broth
-            </Text>
+            <View className="mb-4">
+              <Text className="text-xl font-bold text-gray-900 mb-2">
+                {item.title}
+              </Text>
+              <Text className="text-sm text-gray-500 leading-5">
+                {item.description}
+              </Text>
+            </View>
 
-            {/* Price and quantity selector */}
-            <View className="flex flex-row justify-between items-center mt-3">
-              <Text className="text-lg font-bold text-gray-900">$35.99</Text>
-              <View className="flex-row items-center px-3 py-1">
-                <ButtonHandleQuantity />
+            <View className="flex-row justify-between items-center">
+              <View>
+                <Text className="text-sm text-gray-500 mb-1">Price</Text>
+                <Text className="text-2xl font-bold text-gray-900">${item.price.toFixed(2)}</Text>
+              </View>
+              <View className="flex-row items-center bg-primary rounded-xl px-4 py-2">
+                <TouchableOpacity
+                  onPress={() => dispatch(decreaseQuantity(item))}
+                  disabled={item.quantity <= 1}
+                  className={`w-8 h-8 items-center justify-center ${item.quantity <= 1 ? 'opacity-50' : ''}`}
+                >
+                  <Text className="text-2xl text-darkText">-</Text>
+                </TouchableOpacity>
+                <Text className="text-xl font-bold text-darkText mx-4">
+                  {item.quantity}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => dispatch(increaseQuantity(item))}
+                  className="w-8 h-8 items-center justify-center"
+                >
+                  <Text className="text-2xl text-darkText">+</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
         </View>
       </View>
+    </View>
+  );
 
-      {/* <CartItems orderList={items} total={total}/> */}
+  return (
+    <SafeAreaView className="flex-1 bg-bgLight">
+      <View className="mb-6">
+        <BackButton goBack={() => navigation.goBack()} color="black" />
+      </View>
+
+      <View className="px-4 flex-row items-center gap-4 my-8">
+        <View className="w-14 h-14 rounded-full bg-white shadow-sm justify-center items-center">
+          <Ionicons name="navigate-outline" size={28} color="#f9c32d" />
+        </View>
+        <View className="flex-1">
+          <Text className="text-sm text-gray-500 mb-1">
+            Delivery Address
+          </Text>
+          <Text className="text-base font-semibold text-darkText">
+            Downtown City, California USA
+          </Text>
+        </View>
+      </View>
+
+      <FlatList
+        data={items}
+        renderItem={renderCartItem}
+        keyExtractor={(item) => item.foodId}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 16 }}
+        ListEmptyComponent={() => (
+          <View className="flex-1 justify-center items-center">
+            <Text className="text-xl text-gray-500">Your cart is empty</Text>
+          </View>
+        )}
+      />
+
+      {items.length > 0 && (
+        <View className="px-4 py-4shadow-2xl shadow-gray-400/20">
+          <TouchableOpacity 
+            className="w-full bg-[#f9c32d] py-4 rounded-2xl active:opacity-90"
+            onPress={() => handlePayment()}
+          >
+            <Text className="text-center text-darkText font-bold text-lg">
+              Process To Payment · ${finalTotal.toFixed(2)}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      <ModalWrapper />
     </SafeAreaView>
   );
 };

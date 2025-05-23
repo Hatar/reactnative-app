@@ -8,7 +8,7 @@ import {
 const ButtonHandleQuantity = ({item}) => {
     const dispatch = useDispatch();
   return (
-    <View className="d-flex flex-row bg-primary justify-between items-center self-center w-32 h-12 rounded-md px-4">
+    <View className="d-flex flex-row bg-primary justify-between items-center self-center w-32 h-12 rounded-full px-4">        
         <Pressable
             className="text-darkText text-base"
             onPress={() => dispatch(decreaseQuantity(item))}

@@ -25,8 +25,8 @@ const generalSlice = createSlice({
                 state.itemModal = null;
             }
         },
-        setChangedBehaviorModalWrapper: (state) => {
-            state.changedBehaviorModalWrapper = !state.changedBehaviorModalWrapper
+        setChangedBehaviorModalWrapper: (state,action) => {
+            state.changedBehaviorModalWrapper = action.payload
         },
 
     }

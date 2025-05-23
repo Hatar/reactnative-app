@@ -14,7 +14,8 @@ import FoodsScreen from "../screens/Foods";
 import CheckoutScreen from "../screens/Checkout";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
-import { View,Text } from 'react-native';
+import { View, Text } from 'react-native';
+import ModalWrapper from '../components/ModalWrapper';
 
 //Screen names
 const Splash = "Splash";
@@ -32,46 +33,57 @@ const TabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           let iconName;
           let rn = route.name;
+          
           if (rn === Home) {
-            iconName = focused ? 'home' : 'home-outline';
+            iconName = focused ? 'grid' : 'grid-outline';
           } else if (rn === Profile) {
-            iconName = iconName = focused ? 'people-circle' : 'people-circle-outline'
+            iconName = focused ? 'person-circle' : 'person-circle-outline';
           } else if (rn === AboutUs) {
-            iconName = iconName = focused ? 'information-circle' : 'information-circle-outline';
+            iconName = focused ? 'layers' : 'layers-outline';
           } else if (rn === Checkout) {
-            iconName = iconName = focused ? 'bag-check' : 'bag-check-outline';
+            iconName = focused ? 'bag-handle' : 'bag-handle-outline';
           }
+          
           return (
-            <View className="relative">
-              <Ionicons name={iconName} size={31} color={color} />
-              { rn === Checkout && items.length ? <View className="absolute bottom-3 left-5 w-6 h-6 rounded-full bg-red-500 text-center d-flex justify-center items-center self-center">
-                <Text className="text-white">{items.length}</Text>
-                </View> : null
-              }
-              {focused ? <View className="w-8 border-b-2 border-primary mt-1" />: null}
+            <View className={`items-center justify-center w-16 h-16 ${focused ? 'bg-primary/10 rounded-2xl' : ''}`}>
+              <View className="relative">
+                <Ionicons 
+                  name={iconName} 
+                  size={28} 
+                  color={color}
+                />
+                {rn === Checkout && items.length > 0 && (
+                  <View className="absolute -top-1 -right-2 min-w-[20px] h-[20px] rounded-full bg-red-500 justify-center items-center px-1">
+                    <Text className="text-[11px] font-bold text-white">{items.length}</Text>
+                  </View>
+                )}
+              </View>
             </View>
-          )
+          );
         },
-        headerShown: false,
         tabBarStyle: {
-          paddingTop: 10,
-          height:90,
-          backgroundColor: '#f6f5ff',
+          height: 75,
+          backgroundColor: 'white',
+          borderTopWidth: 1,
+          borderTopColor: '#f1f1f1',
+          paddingVertical: 12,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 3,
         },
-        tabBarLabelStyle: {
-          fontSize: 18, 
-          fontWeight: '500',
-          display: 'none',
-        },
+        tabBarShowLabel: false,
+        headerShown: false,
         tabBarActiveTintColor: '#f9c32d',
-        tabBarInactiveTintColor: '#100c09'
+        tabBarInactiveTintColor: '#757575',
       })}
     >
       <Tab.Screen name={Home} component={HomeScren} />
-      <Tab.Screen name={Checkout} component={CheckoutScreen} /> 
+      <Tab.Screen name={Checkout} component={CheckoutScreen} />
       <Tab.Screen name={Profile} component={ProfileScreen} />
       <Tab.Screen name={AboutUs} component={AboutUsScreen} />
     </Tab.Navigator>
@@ -79,6 +91,8 @@ const TabNavigator = () => {
 }
 
 const Navigation = () => {
+  const {isModalVisible} = useSelector((state) => state.generals);
+  
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={Splash} screenOptions={{ headerShown: false }}>
@@ -91,7 +105,9 @@ const Navigation = () => {
         <Stack.Screen name="Foods" component={FoodsScreen} />
         <Stack.Screen name="InfoFood" component={InfoFoodScreen} />
         <Stack.Screen name={MainTabs} component={TabNavigator} />
+        <Tab.Screen name={Checkout} component={CheckoutScreen} /> 
       </Stack.Navigator>
+      {isModalVisible && <ModalWrapper/>}
     </NavigationContainer>
   )
 }

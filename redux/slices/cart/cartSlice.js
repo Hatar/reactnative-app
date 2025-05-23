@@ -17,7 +17,8 @@ const cartSlice = createSlice({
             if(checkExistItem){
                 checkExistItem.quantity +=1
             } else {
-                state.items.push({...action.payload,quantity:1})
+                const quantity = action.payload.quantity || 1
+                state.items.push({...action.payload, quantity})
             }
             state.total = state.items.reduce((sum,item) =>sum+item.price * item.quantity,0)
         },
@@ -41,12 +42,18 @@ const cartSlice = createSlice({
         },
 
         setTypePayment:(state,action) =>{
+            console.log("action.payload ttttt" ,action.payload);
             state.typePayment = action.payload
         },
+        clearCart: (state) => {
+            state.items = [];
+            state.total = 0;
+            state.typePayment = "";
+        }
     }
 })
 
 
 
-export const {addItemToCart,deleteItemFromCart,increaseQuantity,decreaseQuantity,setTypePayment} = cartSlice.actions
+export const {addItemToCart,deleteItemFromCart,increaseQuantity,decreaseQuantity,setTypePayment,clearCart} = cartSlice.actions
 export default cartSlice.reducer
