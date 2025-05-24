@@ -7,7 +7,7 @@ const Splash = () => {
 
   useEffect(() => { 
     const timeOut = setTimeout(() => {
-      navigation.replace('MainTabs');
+      navigation.replace('Welcome');
     }, 2000);
     return () => clearTimeout(timeOut); 
   }, []);

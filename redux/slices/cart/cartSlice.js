@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-
+import actTrackOrder from "./act/actTrackOrder";
 
 const initialState = {
     items:[],
     total:0,
     typePayment:"",
+    loading: "idle",
+    error: null
 }
 
 const cartSlice = createSlice({
@@ -40,9 +41,7 @@ const cartSlice = createSlice({
             }
             state.total = state.items.reduce((sum,item) =>sum+item.price * item.quantity,0)
         },
-
         setTypePayment:(state,action) =>{
-            console.log("action.payload ttttt" ,action.payload);
             state.typePayment = action.payload
         },
         clearCart: (state) => {
@@ -50,10 +49,28 @@ const cartSlice = createSlice({
             state.total = 0;
             state.typePayment = "";
         }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(actTrackOrder.pending,(state) =>{
+            state.loading = "pending";
+            state.error = null;
+        })
+        builder.addCase(actTrackOrder.fulfilled,(state,action) =>{
+            state.loading = "succeeded";
+            // Don't modify the items here since we're just tracking the order
+            state.paymentMethod = action.payload.paymentMethod;
+            // Clear the cart after successful order
+            state.items = [];
+            state.total = 0;
+            state.typePayment = "";
+        })
+        builder.addCase(actTrackOrder.rejected,(state,action) =>{
+            state.loading = "failed";
+            state.error = action.payload;
+        })
     }
 })
 
-
-
+export {actTrackOrder}
 export const {addItemToCart,deleteItemFromCart,increaseQuantity,decreaseQuantity,setTypePayment,clearCart} = cartSlice.actions
 export default cartSlice.reducer

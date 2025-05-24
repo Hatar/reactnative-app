@@ -3,7 +3,7 @@ import BackButton from "../components/BackButton";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
-import { increaseQuantity, decreaseQuantity, setTypePayment, clearCart } from "../redux/slices/cart/cartSlice";
+import { increaseQuantity, decreaseQuantity, setTypePayment, clearCart, actTrackOrder } from "../redux/slices/cart/cartSlice";
 import ModalWrapper from "../components/ModalWrapper"
 import { toggleModalWrapper, setChangedBehaviorModalWrapper, setItemModalWrapper } from "../redux/slices/General/generalSlice";
 import actApiPayment from "../redux/slices/cart/act/actApiPayment.js";
@@ -175,8 +175,31 @@ const Checkout = () => {
   };
 
   const handleCashPayment = async () => {
-    Alert.alert("Cash Payment", "Cash payment is not implemented yet.");
-    return false;
+    try {
+      const orderItems = items.map(item => ({
+        foodId: item.foodId,
+        quantity: item.quantity
+      }));
+
+      const response = await dispatch(actTrackOrder({
+        items: orderItems,
+        paymentMethod: 'cash'
+      }));
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      Alert.alert(
+        "Success",
+        "Cash payment order placed successfully!",
+        [{ text: "OK", onPress: () => navigation.navigate("MainTabs") }]
+      );
+      return true;
+    } catch (error) {
+      Alert.alert("Error", error.message);
+      return false;
+    }
   };
 
   const processPayment = async (selectedPaymentType) => {
