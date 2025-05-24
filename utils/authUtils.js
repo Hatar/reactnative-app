@@ -4,8 +4,10 @@ import { jwtDecode } from 'jwt-decode';
 export const checkAuthStatus = async () => {
   try {
     const token = await AsyncStorage.getItem('token');
+    const email = await AsyncStorage.getItem('userEmail');
+    
     if (!token) {
-      return { isAuthenticated: false, role: null };
+      return { isAuthenticated: false, role: null, email: null };
     }
     
     // Verify token expiration
@@ -15,16 +17,18 @@ export const checkAuthStatus = async () => {
     if (decoded.exp < currentTime) {
       // Token expired
       await AsyncStorage.removeItem('token');
-      return { isAuthenticated: false, role: null };
+      await AsyncStorage.removeItem('userEmail');
+      return { isAuthenticated: false, role: null, email: null };
     }
     
     return { 
       isAuthenticated: true, 
       token,
+      email,
       role: decoded.role 
     };
   } catch (error) {
     console.error('Auth check error:', error);
-    return { isAuthenticated: false, role: null };
+    return { isAuthenticated: false, role: null, email: null };
   }
 }; 

@@ -165,7 +165,10 @@ const Home = () => {
       {/* Header */}
       <View className="flex-row justify-between items-center mx-4 mb-6 mt-5">
         <View className="flex-row items-center">
-          <Ionicons name="menu" size={28} color="#333" />
+          <Image 
+            source={ICONS.logo} 
+            className="w-10 h-10 rounded-lg"
+          />
           <Text className="ml-3 text-xl font-bold text-darkText">EggsXpress</Text>
         </View>
         <Pressable 

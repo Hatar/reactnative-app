@@ -8,6 +8,7 @@ const initialState = {
   user: null,
   token: null,
   role: null,
+  email: null,
   loading: false,
   error: null,
   isAuthenticated: false
@@ -19,8 +20,10 @@ const authSlice = createSlice({
   reducers: {
     signOut: (state) => {
       AsyncStorage.removeItem("token")
+      AsyncStorage.removeItem("userEmail")
       state.token = null
       state.role = null
+      state.email = null
       state.isAuthenticated = false
     },
     setUserInfo: (state) => {
@@ -30,6 +33,7 @@ const authSlice = createSlice({
       state.user = null,
       state.error = null,
       state.role = null,
+      state.email = null,
       state.isAuthenticated = false
     },
     setTypeRole: (state, action) => {
@@ -38,6 +42,7 @@ const authSlice = createSlice({
     restoreAuthState: (state, action) => {
       state.token = action.payload.token
       state.role = action.payload.role
+      state.email = action.payload.email
       state.isAuthenticated = true
       state.error = null
     }
@@ -49,6 +54,7 @@ const authSlice = createSlice({
     }),
     builder.addCase(actSignIn.fulfilled, (state, action) => {
       state.token = action.payload.token
+      state.email = action.payload.email
       if (action.payload && action.payload.token) {
         state.role = action.payload ? jwtDecode(action.payload.token).role : null
         state.isAuthenticated = true

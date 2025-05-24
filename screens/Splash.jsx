@@ -18,7 +18,8 @@ const Splash = () => {
         if (authStatus.isAuthenticated) {
           dispatch(restoreAuthState({
             token: authStatus.token,
-            role: authStatus.role
+            role: authStatus.role,
+            email: authStatus.email
           }));
           navigation.replace('MainTabs');
         } else {
