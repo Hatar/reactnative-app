@@ -26,8 +26,8 @@ const Signin = () => {
             return
         } 
         const response = await dispatch(actSignIn({ email: email.value, password: password.value }))
-        if (response?.error?.message !== "Rejected") {
-            await navigation.navigate('MainTabs');
+        if (!response.error) {
+            navigation.replace('MainTabs');
         }
     }
 
