@@ -1,4 +1,4 @@
-import { SafeAreaView, View, Text, Image, TouchableOpacity, FlatList, Alert } from "react-native";
+import { SafeAreaView, View, Text, Image, TouchableOpacity, FlatList, Alert, Modal } from "react-native";
 import BackButton from "../components/BackButton";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
@@ -9,6 +9,10 @@ import { toggleModalWrapper, setChangedBehaviorModalWrapper, setItemModalWrapper
 import actApiPayment from "../redux/slices/cart/act/actApiPayment.js";
 import { useStripe } from "@stripe/stripe-react-native";
 import { useState, useCallback, useEffect } from "react";
+import { WebView } from 'react-native-webview';
+
+// API URL constant
+const API_URL = 'http://192.168.1.4:5500';
 
 const Checkout = () => {
   const navigation = useNavigation();
@@ -18,6 +22,8 @@ const Checkout = () => {
   const { typeModal } = useSelector((state) => state.generals);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [paymentSheetInitialized, setPaymentSheetInitialized] = useState(false);
+  const [paypalUrl, setPaypalUrl] = useState(null);
+  const [paypalOrderId, setPaypalOrderId] = useState(null);
 
   const handleDeleteItem = (item) => {
     dispatch(toggleModalWrapper(true))
@@ -93,8 +99,79 @@ const Checkout = () => {
   };
 
   const handlePayPal = async () => {
-    Alert.alert("PayPal Payment", "PayPal payment is not implemented yet.");
-    return false;
+    try {
+      const response = await fetch(`${API_URL}/payments/paypal/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': 'en-US'
+        },
+        body: JSON.stringify({
+          amount: Math.floor(total * 100)
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.details || 'Failed to create order');
+      }
+
+      if (data.orderId) {
+        setPaypalOrderId(data.orderId);
+        setPaypalUrl(`https://www.sandbox.paypal.com/checkoutnow?token=${data.orderId}&locale.x=en_US&country.x=US&locale=en_US`);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('PayPal Error:', error);
+      Alert.alert('Error', 'Could not initiate PayPal checkout');
+      return false;
+    }
+  };
+
+  const handlePayPalResponse = async (response) => {
+    const { url } = response;
+    
+    if (url.includes('success') && paypalOrderId) {
+      try {
+        const response = await fetch(`${API_URL}/payments/paypal/capture-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            orderId: paypalOrderId
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.details || 'Failed to capture payment');
+        }
+
+        if (data.success) {
+          setPaypalUrl(null);
+          setPaypalOrderId(null);
+          resetPaymentState();
+          Alert.alert(
+            "Success",
+            "Payment successful!",
+            [{ text: "OK", onPress: () => navigation.navigate("MainTabs") }]
+          );
+        }
+      } catch (error) {
+        console.error('Capture Error:', error);
+        Alert.alert('Error', 'Could not complete payment');
+        setPaypalUrl(null);
+        setPaypalOrderId(null);
+      }
+    } else if (url.includes('cancel')) {
+      setPaypalUrl(null);
+      setPaypalOrderId(null);
+      Alert.alert('Payment Cancelled', 'You cancelled the payment');
+    }
   };
 
   const handleCashPayment = async () => {
@@ -125,16 +202,7 @@ const Checkout = () => {
 
       if (success) {
         resetPaymentState();
-        Alert.alert(
-          "Payment Successful",
-          "Your order has been placed successfully!",
-          [
-            {
-              text: "OK",
-              onPress: () => navigation.navigate("MainTabs")
-            }
-          ]
-        );
+        navigation.navigate("MainTabs");
       } else {
         dispatch(setTypePayment(null));
         setIsPaymentPending(false);
@@ -273,6 +341,42 @@ const Checkout = () => {
         </View>
       )}
       <ModalWrapper />
+
+      {paypalUrl ? (
+        <Modal visible={!!paypalUrl} animationType="slide">
+          <SafeAreaView style={{ flex: 1 }}>
+            <View className="flex-row justify-between items-center p-4 bg-white">
+              <Text className="text-lg font-bold">PayPal Checkout</Text>
+              <TouchableOpacity 
+                onPress={() => {
+                  setPaypalUrl(null);
+                  setPaypalOrderId(null);
+                }}
+                className="p-2"
+              >
+                <Ionicons name="close" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+            <WebView
+              source={{ 
+                uri: paypalUrl,
+                headers: {
+                  'Accept-Language': 'en-US',
+                  'Content-Language': 'en-US'
+                }
+              }}
+              onNavigationStateChange={handlePayPalResponse}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              startInLoadingState={true}
+              injectedJavaScript={`
+                document.documentElement.lang = 'en';
+                document.documentElement.setAttribute('lang', 'en');
+              `}
+            />
+          </SafeAreaView>
+        </Modal>
+      ) : null}
     </SafeAreaView>
   );
 };
