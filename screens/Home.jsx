@@ -1,243 +1,272 @@
-import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View, FlatList, Image, TouchableOpacity, useWindowDimensions } from "react-native";
+import { useState, useEffect, useMemo } from "react";
+import {
+  SafeAreaView,
+  View,
+  Image,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Pressable,
+  ScrollView,
+  RefreshControl
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { actGetCategories } from "../redux/slices/category/categorySlice";
-import Buttons from "../components/Buttons";
 import { actGetFoods } from "../redux/slices/food/foodSlice";
-import { COLORS, ICONS } from "../constants";
-import Dashboard from "./dashboard";
+import TextInput from "../components/TextInput";
+import Buttons from "../components/Buttons";
+import { ICONS } from "../constants";
 import { useNavigation } from "@react-navigation/native";
-import { addItemToCart } from "../redux/slices/cart/cartSlice";
-import { isIncludeInCart } from "../helpers";
-import EmptyContent from "../components/EmptyContent";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { truncateText } from "../helpers";
+import CategoryIcon from "../components/CategoryIcon";
 
-function Home() {
-  const navigation = useNavigation();
-  const { categories } = useSelector((state) => state.categories);
-  const { foods } = useSelector((state) => state.foods);
-  const { items } = useSelector((state) => state.carts);
-  const role = useSelector((state) => state.auth.role);
-
-  const [filterFoods,setFilterFoods] = useState([])
+const Home = () => {
+  const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const {width} = useWindowDimensions()
+  // Redux state
+  const { categories } = useSelector((state) => state.categories);
+  const { foods } = useSelector((state) => state.foods);
 
+  // Filter foods based on search and category
+  const filteredFoods = useMemo(() => {
+    let result = foods;
+
+    // Filter by search term
+    if (search.trim()) {
+      const searchLower = search.toLowerCase().trim();
+      result = result.filter(food => 
+        food.title.toLowerCase().includes(searchLower) ||
+        food.description.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Filter by category
+    if (activeCategory) {
+      result = result.filter(food => food.categoryId === activeCategory);
+    }
+
+    return result;
+  }, [foods, search, activeCategory]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([
+      dispatch(actGetCategories()),
+      dispatch(actGetFoods())
+    ]);
+    setRefreshing(false);
+  };
+
+  const handleSearch = (text) => {
+    setSearch(text);
+    setActiveCategory(null); // Reset category filter when searching
+  };
+
+  const handleFilterFoodByCategory = (id) => {
+    setActiveCategory(activeCategory === id ? null : id);
+    setSearch(""); // Reset search when changing category
+  };
 
   useEffect(() => {
     dispatch(actGetCategories());
     dispatch(actGetFoods());
   }, [dispatch]);
 
-
-  useEffect(()=>{
-    setFilterFoods(foods)
-  },[foods])
-
-
-
-  const handleAddToCart = (item) => {
-    if (!isIncludeInCart(items, item)) {
-      dispatch(addItemToCart(item));
-    }
+  const renderCategoryItem = ({ item }) => {
+    const isActive = activeCategory === item.categoryId;
+    
+    return (
+      <TouchableOpacity
+        className={`flex-row items-center px-5 py-3 rounded-2xl mr-3 ${
+          isActive ? 'bg-primary' : 'bg-white'
+        }`}
+        onPress={() => handleFilterFoodByCategory(item.categoryId)}
+        style={{ 
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 3,
+          transform: [{ scale: isActive ? 1.05 : 1 }]
+        }}
+      >
+        <CategoryIcon title={item.nameCategory} isActive={isActive} />
+        <Text className={`ml-2 font-semibold ${
+          isActive ? 'text-white' : 'text-black'
+        }`}>
+          {item.nameCategory}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
+  const renderEmptyFoodList = () => (
+    <View className="flex-1 items-center justify-center py-8">
+      <Ionicons name="search-outline" size={48} color="#9ca3af" />
+      <Text className="text-gray-400 text-lg mt-4 text-center">
+        {search.trim() 
+          ? "No foods found matching your search"
+          : activeCategory 
+            ? "No foods in this category"
+            : "No foods available"}
+      </Text>
+    </View>
+  );
 
-  const handleFilterFoodByCategory = (idCategory) => {
-    if (activeCategory === idCategory) {
-      setActiveCategory(null)
-      setFilterFoods(foods)
-    } else {
-      setActiveCategory(idCategory);
-      setFilterFoods(foods.filter(food => food.categoryId === idCategory));
-    }
-  };
+  const renderFoodItem = ({ item }) => (
+    <TouchableOpacity
+      className="flex-1 bg-white rounded-2xl p-4 min-h-[200px]"
+      style={{ 
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3
+      }}
+      onPress={() => navigation.navigate("InfoFood", { item })}
+    >
+      <View className="items-center">
+        <View className="relative">
+          <Image
+            source={{ uri: item.imageUrl }}
+            className="w-32 h-32 rounded-full"
+            style={{ borderWidth: 6, borderColor: '#f9c32d' }}
+          />
+          {!item.inStock && (
+            <View className="absolute inset-0 bg-black/50 rounded-full justify-center items-center">
+              <Text className="text-white font-bold">Out of Stock</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      <View className="items-center gap-2 mt-3">
+        <Text className="text-lg font-bold text-center text-darkText">
+          {truncateText(item.title, 20)}
+        </Text>
+        <Text className="text-sm text-center text-gray-500">
+          {truncateText(item.description, 40)}
+        </Text>
+        <Text className="text-xl text-primary font-bold">
+          ${item.price.toFixed(2)}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {role !== "admin" ? (
-        <>
-          {categories.length > 0 && <Text style={styles.title}>Categories</Text> } 
-          <View>
-            <FlatList
-              data={categories}
-              horizontal
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <Buttons
-                  title={item.name}
-                  stylesText={styles.textButton}
-                  stylesButton={[styles.categoryButton,activeCategory === item.id && styles.activeCategoryBtn,]}
-                  pressHandler={()=> handleFilterFoodByCategory(item.id)}
-                />
-              )}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoryContainer}
+    <SafeAreaView className="flex-1 bg-bgLight">
+      {/* Header */}
+      <View className="flex-row justify-between items-center mx-4 mb-6 mt-5">
+        <View className="flex-row items-center">
+          <Image 
+            source={ICONS.logo} 
+            className="w-10 h-10 rounded-lg"
+          />
+          <Text className="ml-3 text-xl font-bold text-darkText">EggsXpress</Text>
+        </View>
+        <Pressable 
+          className="bg-primary w-12 h-12 rounded-full justify-center items-center"
+          onPress={() => navigation.navigate("Profile")}
+        >
+          <Ionicons name="person" size={24} color="#333" />
+        </Pressable>
+      </View>
+
+      <ScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Welcome Section */}
+        <View className="mx-4 mb-6">
+          <Text className="font-bold text-3xl text-black">Order Fresh &</Text>
+          <View className="flex-row items-center">
+            <Text className="font-bold text-3xl text-black mr-2">
+              Tasty Food Now!
+            </Text>
+            <Image className="w-8 h-8" source={ICONS.fire} />
+          </View>
+        </View>
+
+        {/* Search */}
+        <View className="px-4 flex-row w-full gap-3 mb-6">
+          <View className="flex-1">
+            <TextInput
+              placeholder="Search for food..."
+              value={search}
+              autoCapitalize="none"
+              onChangeText={handleSearch}
+              className="w-full h-14 px-4 bg-white rounded-xl shadow-sm shadow-black/10 text-gray-800"
             />
           </View>
-          {filterFoods.length > 0 && <Text style={styles.title}>Foods</Text>}
-          <View style={{flex:1}}>
-              {
-                filterFoods && filterFoods.length > 0 ? 
-                  (
-                    <FlatList
-                      data={filterFoods}
-                      keyExtractor={(item) => item.id.toString()}
-                      renderItem={({ item }) => (
-                        <TouchableOpacity 
-                          style={[styles.foodCard, !item.inStock && styles.disabledCard]} 
-                          onPress={() => navigation.navigate("InfoFood", { item })}
-                          disabled={!item.inStock}
-                        >
-                          <View style={styles.imageContainer}>
-                            <Image source={{ uri: item.imageUrl }} style={styles.foodImage} />
-                            {!item.inStock && (
-                              <View style={styles.outStockOverlay}>
-                                <Text style={styles.outStockText}>Out of Stock</Text>
-                              </View>
-                            )}
-                          </View>
-                          <View style={styles.foodInfo}>
-                            <Text style={styles.foodName} numberOfLines={1} ellipsizeMode="tail">
-                              {item.title}
-                            </Text>
-                            <Text style={styles.foodPrice}>{item.price}$</Text>
-                            <View style={styles.addToCartContainer}>
-                              <Buttons
-                                title="Add to Cart"
-                                pressHandler={() => item.inStock && handleAddToCart(item)}
-                                stylesText={styles.textButton}
-                                stylesButton={[styles.addToCartButton, !item.inStock && styles.disabledButton]}
-                                disabled={!item.inStock}
-                              />
-                            </View>
-                          </View>
-                        </TouchableOpacity>
-                      )}
-                      numColumns={width === 576 ? 3 : 2}
-                      columnWrapperStyle={styles.row}
-                      showsVerticalScrollIndicator={false}
-                    />
-                  )
-                : <EmptyContent title={"Foods"} image={ICONS.NoFood} />
-              }
+          <Buttons
+            Icon={<Ionicons name="filter-outline" size={24} color="#333" />}
+            pressHandler={() => {}}
+            stylesButton="w-14 h-14 bg-primary rounded-xl justify-center items-center"
+          />
+        </View>
+
+        {/* Categories */}
+        <View className="mb-6 py-2">
+          <View className="flex-row justify-between items-center mx-4 mb-4">
+            <Text className="font-bold text-2xl text-black">Categories</Text>
           </View>
-          
-        </>
-      ) : (
-        <Dashboard />
-      )}
+          <FlatList
+            data={categories}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item?.categoryId}
+            renderItem={renderCategoryItem}
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+              gap: 12
+            }}
+            className="min-h-[80px]"
+            ListEmptyComponent={
+              <View className="flex-1 items-center justify-center">
+                <Text className="text-gray-400">No categories found</Text>
+              </View>
+            }
+          />
+        </View>
+
+        {/* Popular Foods */}
+        <View className="mx-4 mb-4">
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="font-bold text-2xl text-black">
+              {activeCategory ? 'Category Foods' : 'Popular Foods'}
+            </Text>
+            <TouchableOpacity onPress={() => {
+              setActiveCategory(null);
+              setSearch('');
+            }}>
+              <Text className="text-primary font-semibold">
+                {(activeCategory || search) ? 'Clear Filters' : 'See All'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {filteredFoods.length > 0 ? (
+            <View className="flex-row flex-wrap gap-4">
+              {filteredFoods.map((item) => (
+                <View key={item.foodId} style={{ width: '47%' }}>
+                  {renderFoodItem({ item })}
+                </View>
+              ))}
+            </View>
+          ) : renderEmptyFoodList()}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    margin: 10,
-    flex: 1,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 10,
-    marginBottom: 10,
-  },
-  disabledCard: {
-    backgroundColor: "#d3d3d3",
-  },
-  imageContainer: {
-    position: "relative",
-  },
-  outStockOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  outStockText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  categoryContainer: {
-    gap: 10,
-    paddingBottom: 10,
-  },
-  categoryButton: {
-    backgroundColor: COLORS.cardBg,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-  },
-  activeCategoryBtn:{
-    backgroundColor: COLORS.errors,
-  },
-  textButton: {
-    color: "#FFF",
-    fontSize: 14,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  foodCard: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    margin: 5,
-    overflow: "hidden",
-  },
-  foodImage: {
-    width: "100%",
-    height: 120,
-    resizeMode: "cover",
-    aspectRatio: 1.5,
-  },
-  foodInfo: {
-    padding: 10,
-    alignItems: "center",
-  },
-  foodName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  foodPrice: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
-    marginTop: 5,
-  },
-  addToCartButton: {
-    backgroundColor: COLORS.cardBg,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    alignSelf: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-  },
-  disabledButton: {
-    backgroundColor: "#999",
-  },
-  addToCartContainer: {
-    marginTop: 10,
-  },
-  noCategoriesContainer: {
-    alignItems: "center",
-    marginTop: 20,
-  },
-});
+};
 
 export default Home;

@@ -4,7 +4,6 @@ import actGetFoods from "./act/actGetFoods"
 import actDeleteFood from "./act/actDeleteFood"
 import actEditFood from "./act/actEditFood"
 
-
 const initialState = {
     foods:[],
     tabName:"all",
@@ -29,10 +28,8 @@ const foodSlice = createSlice({
             state.errror=null
         }),
         builder.addCase(actGetFoods.fulfilled,(state,action) =>{
-            state.loading="succeeded",
-            state.foods = [
-                ...new Map(action.payload.map((food) => [food.id, food])).values(),
-            ];
+            state.loading="succeeded"
+            state.foods = action.payload
               
         }),
         builder.addCase(actGetFoods.rejected,(state,action) =>{
@@ -69,7 +66,7 @@ const foodSlice = createSlice({
 
         builder.addCase(actEditFood.fulfilled, (state, action) => {
             state.loading = "succeeded";
-            const index = state.foods.findIndex((food) => food.id === action.payload.id);
+            const index = state.foods.findIndex((food) => food.foodId === action.payload.foodId);
             if (index !== -1) {
                 state.foods[index] = action.payload;
             }

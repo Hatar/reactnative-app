@@ -1,14 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { FIREBASE_DB } from "../../../../firebase";
-import { doc, deleteDoc } from "firebase/firestore";
-
+import request from "../../../../apis";
 const actDeleteFood = createAsyncThunk(
   "foods/actDeleteFood",
-  async (foodId, { rejectWithValue }) => {
+  async ({foodId,categoryId}, { rejectWithValue }) => {
     try {
-      const categoryDocRef = doc(FIREBASE_DB, "foods", foodId)
-      await deleteDoc(categoryDocRef)
-      return { id: foodId }
+      await request(`deleteFood/${foodId}/${categoryId}`,"DELETE")
+      return foodId
     } catch (error) {
       return rejectWithValue(error.message)
     }
@@ -16,3 +13,5 @@ const actDeleteFood = createAsyncThunk(
 );
 
 export default actDeleteFood;
+
+

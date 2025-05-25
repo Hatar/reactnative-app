@@ -1,198 +1,164 @@
-import { StyleSheet, TouchableOpacity, View, Text, Image } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import Home from "../screens/Home";
-import Welcome from "../screens/Welcome";
-import Signin from "../screens/Signin";
-import Signup from "../screens/Signup";
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import SplashScreen from "../screens/Splash";
+import WelcomeScreen from "../screens/Welcome";
+import SigninScreen from "../screens/Signin";
+import SignupScreen from "../screens/Signup";
 import ResetPasswordScreen from "../screens/ResetPasswordScreen";
-import { COLORS, ICONS } from "../constants";
-import AboutUs from "../screens/AboutUs";
-import CartIcon from "../components/CartIcon";
-import InfoFood from "../screens/InfoFood";
-import Checkout from "../screens/Checkout";
-import Cart from "../screens/Cart";
-import AdminScreen from "../screens/AdminScreen";
-import { SafeAreaView } from "react-native-safe-area-context";
-import aboutIcon from "../assets/information-button.png";
-import { useSelector } from "react-redux";
-import Categories from "../screens/Categories";
-import Foods from "../screens/Foods";
+import HomeScren from "../screens/Home";
+import AboutUsScreen from "../screens/AboutUs";
+import ProfileScreen from "../screens/Profile";
+import InfoFoodScreen from "../screens/InfoFood";
+import FoodsScreen from "../screens/Foods";
+import CategoryScreen from "../screens/Categories";
+import DashboardScreen from "../screens/dashboard";
+
+import CheckoutScreen from "../screens/Checkout";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useSelector, useDispatch } from 'react-redux';
+import { View, Text, TouchableOpacity } from 'react-native';
+import ModalWrapper from '../components/ModalWrapper';
+import { useNavigation } from '@react-navigation/native';
+import { signOut } from '../redux/slices/auth/authSlice';
+
+//Screen names
+const Splash = "Splash";
+const Home = "Home";
+const Profile = "Profile";
+const Foods = "Foods";
+const Category = "Category";
+const AboutUs = "AboutUs";
+const MainTabs = "MainTabs";
+const Checkout = "Checkout";
+const Dashboard = "Dashboard";
+
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+const TabNavigator = () => {
+  const {items} = useSelector((state)=>state.carts)
+  const {role} = useSelector((state)=>state.auth)
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const isAdmin = role === "admin"
+
+  const handleSignOut = () => {
+    dispatch(signOut());
+    navigation.replace('Signin');
+  };
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color }) => {
+          let iconName;
+          let rn = route.name;
+          
+          if (rn === Home) {
+            iconName = focused ? 'grid' : 'grid-outline';
+          } else if (rn === Profile) {
+            iconName = focused ? 'person-circle' : 'person-circle-outline';
+          } else if (rn === Foods) {
+            iconName = focused ? 'fast-food' : 'fast-food-outline';
+          } else if (rn === Category) {
+            iconName = focused ? 'list' : 'list-outline';
+          } else if (rn === AboutUs) {
+            iconName = focused ? 'layers' : 'layers-outline';
+          } else if (rn === Checkout) {
+            iconName = focused ? 'bag-handle' : 'bag-handle-outline';
+          } else if (rn === Dashboard) {
+            iconName = focused ? 'speedometer' : 'speedometer-outline';
+          }
+          
+          return (
+            <View className={`items-center justify-center w-16 h-16 ${focused ? 'bg-primary/10 rounded-2xl' : ''}`}>
+              <View className="relative">
+                <Ionicons 
+                  name={iconName} 
+                  size={28} 
+                  color={color}
+                />
+                {rn === Checkout && items.length > 0 && (
+                  <View className="absolute -top-1 -right-2 min-w-[20px] h-[20px] rounded-full bg-red-500 justify-center items-center px-1">
+                    <Text className="text-[11px] font-bold text-white">{items.length}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          );
+        },
+        tabBarStyle: {
+          height: 75,
+          backgroundColor: 'white',
+          borderTopWidth: 1,
+          borderTopColor: '#f1f1f1',
+          paddingVertical: 12,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 3,
+        },
+        tabBarShowLabel: false,
+        headerShown: false,
+        tabBarActiveTintColor: '#f9c32d',
+        tabBarInactiveTintColor: '#757575',
+      })}
+    >
+      {isAdmin ? (
+        <>
+          <Tab.Screen name={Dashboard} component={DashboardScreen} />
+          <Tab.Screen name={Foods} component={FoodsScreen} />
+          <Tab.Screen name={Category} component={CategoryScreen} />
+          <Tab.Screen name={Profile} component={ProfileScreen} />
+          <Tab.Screen
+            name="Signout"
+            options={{
+              tabBarButton: (props) => (
+                <TouchableOpacity {...props} onPress={handleSignOut} style={{alignItems:'center',justifyContent:'center',flex:1}}>
+                  <Ionicons name="log-out-outline" size={28} color="#fb8c00" />
+                  <Text style={{fontSize:12, color:'#fb8c00', marginTop:2}}>Signout</Text>
+                </TouchableOpacity>
+              ),
+            }}
+          >
+            {null}
+          </Tab.Screen>
+        </>
+      ) : (
+        <>
+          <Tab.Screen name={Home} component={HomeScren} />
+          <Tab.Screen name={Checkout} component={CheckoutScreen} />
+          <Tab.Screen name={Profile} component={ProfileScreen} />
+          <Tab.Screen name={AboutUs} component={AboutUsScreen} />
+        </>
+      )}
+    </Tab.Navigator>
+  );
+}
 
 const Navigation = () => {
-  const menuItems = [
-    { label: "Home", navigateTo: "Home", icon: ICONS.logo },
-    {
-      label: "Categories",
-      navigateTo: "Categories",
-      icon: ICONS.combosIcon,
-    },
-    {
-      label: "Foods",
-      navigateTo: "Foods",
-      icon: ICONS.mealIcon,
-    },
-    { label: "About Us", navigateTo: "About Us", icon: aboutIcon },
-  ]
-  const Stack = createNativeStackNavigator();
-  const Drawer = createDrawerNavigator();
-
-
-
-  const CustomDrawerContent = ({ navigation }) => {
-    const role = useSelector((state) => state.auth.role)
-    const filteredMenuItems = role ==="admin"
-      ? menuItems
-      : menuItems.filter(item => item.label !== "Categories" && item.label !== "Foods");
-    const userMenuItems = [
-      { label: "Sign Out", navigateTo: "Signin", icon: ICONS.SignOutIcon },
-    ];
-
-    const renderMenuItems = (items) => {
-      const uniqueItems = [
-        ...new Map(items.map((item) => [item.label, item])).values(),
-      ];
-      return uniqueItems.map((item, index) => (
-        <TouchableOpacity
-          key={index}
-          onPress={() =>
-            navigation.navigate(item.navigateTo, {
-              params: { menuId: item.id },
-            })
-          }
-          style={styles.menuItem}
-        >
-          {item.icon && <Image style={styles.icons} source={item.icon} />}
-          <Text style={styles.item_slider}>{item.label}</Text>
-        </TouchableOpacity>
-      ));
-    };
-
-    return (
-      <SafeAreaView style={{ flex: 1 }}>
-        <AdminScreen />
-        <View style={styles.content_slider}>
-          <View>{renderMenuItems(filteredMenuItems)}</View>
-          <View>{renderMenuItems(userMenuItems)}</View>
-        </View>
-      </SafeAreaView>
-    );
-  };
-
-  const DrawerNavigator = () => {
-    const uniqueMenuItems = Array.from(
-      new Map(menuItems.map((item) => [item.label, item])).values()
-    );
-    const role = useSelector((state) => state.auth.role);
-    const getComponentForMenu = (label) => {
-      switch (label) {
-        case "Foods":
-          return Foods
-        case "Categories":
-          return Categories
-        case "About Us":
-          return AboutUs;
-        default:
-          return Home;
-      }
-    };
-    return (
-      <Drawer.Navigator
-        screenOptions={() => ({
-          headerShown: true,
-          headerTitle: "Menu",
-          drawerStyle: {
-            backgroundColor: COLORS.white,
-            width: 300,
-          },
-          headerRight: () => 
-            role !=="admin" ? (
-              <TouchableOpacity
-                onPress={() => {
-                  console.log("Right icon pressed");
-                }}
-                style={{ marginRight: 15 }}
-              >
-                <CartIcon />
-              </TouchableOpacity>
-            ) : null
-        })
-    }
-        drawerContent={(props) => <CustomDrawerContent {...props} />}
-      >
-        {uniqueMenuItems &&
-          uniqueMenuItems.length > 0 &&
-          uniqueMenuItems.map((menu, index) => {
-            const Component = getComponentForMenu(menu.label);
-            return (
-              <Drawer.Screen
-                key={index}
-                name={menu.label}
-                component={Component}
-                initialParams={{ title: menu.label, menuId: menu.id }}
-                options={{
-                  headerShown:menu.label !== "About Us",
-                }}
-              />
-            );
-          })}
-      </Drawer.Navigator>
-    );
-  };
+  const {isModalVisible} = useSelector((state) => state.generals);
+  
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Welcome"
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="Welcome" component={Welcome} />
-        <Stack.Screen name="InfoFood" component={InfoFood} />
-        <Stack.Screen name="Home" component={DrawerNavigator} />
-        <Stack.Screen name="Signin" component={Signin} />
-        <Stack.Screen name="Categories" component={Categories} />
-        <Stack.Screen name="Foods" component={Foods} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen
-          name="ResetPasswordScreen"
-          component={ResetPasswordScreen}
-        />
-        <Stack.Screen name="Checkout" component={Checkout} />
-        <Stack.Screen name="Cart" component={Cart} />
+      <Stack.Navigator initialRouteName={Splash} screenOptions={{ headerShown: false }}>
+        <Stack.Screen name={Splash} component={SplashScreen} />
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Signin" component={SigninScreen} />
+        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Foods" component={FoodsScreen} />
+        <Stack.Screen name="Category" component={CategoryScreen} />
+        <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        <Stack.Screen name="InfoFood" component={InfoFoodScreen} />
+        <Stack.Screen name={MainTabs} component={TabNavigator} />
       </Stack.Navigator>
+      {isModalVisible && <ModalWrapper/>}
     </NavigationContainer>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  content_slider: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    marginVertical: 30,
-  },
-  item_slider: {
-    padding: 15,
-    fontSize: 18,
-    color: COLORS.cardBg,
-  },
-  icons: {
-    width: 24,
-    height: 24,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center", // Vertically center the icon and text
-    padding: 15,
-  },
-});
+  )
+}
 
 export default Navigation;

@@ -1,14 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { FIREBASE_DB } from "../../../../firebase";
-import { collection, addDoc } from "firebase/firestore";
+import request from "../../../../apis";
 
 const actEditCategory = createAsyncThunk(
   "categories/actEditCategory",
   async (categoryData, { rejectWithValue }) => {
     try {
-      const categoriesColl = collection(FIREBASE_DB, "categories");
-      const docRef = await addDoc(categoriesColl, categoryData);
-      return { id: docRef.id, ...categoryData };
+      const response = await request(`category/updateCategory/${categoryData.id}`,"PUT",{nameCategory:categoryData.nameCategory})
+      return response.updatedCategory
     } catch (error) {
       return rejectWithValue(error.message);
     }

@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text,Image, StyleSheet } from 'react-native';
 import { COLORS } from '../constants';
 import pizza from '../assets/pizza.png'
-import { useSelector } from 'react-redux';
+import useIsAdmin from '../hooks/useIsAdmin';
 const AdminScreen = () => {
-  const {role} = useSelector((state)=>state.auth)
+  const isAdmin = useIsAdmin()
   return (
     <View style={styles.wrapper}>
         <View style={styles.content}>
@@ -16,7 +16,7 @@ const AdminScreen = () => {
                   height: 80,
               }} 
           />
-          <Text style={styles.name_profile}> {role === "user" ? "Customer" : "Admin" }</Text>
+          <Text style={styles.name_profile}>{isAdmin ? "Admin" : "Customer" }</Text>
         </View>
     </View>
   );

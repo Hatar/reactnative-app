@@ -1,10 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import request from "../../../../servers/api";
+import request from "../../../../apis";
 
-export const actSignUp = createAsyncThunk("auth/actSignUp",async ({email,password,confirmPassword,firstName,lastName,gender},thunkAPI) =>{
+export const actSignUp = createAsyncThunk(({role = "User"}) =>
+    `auth/actSignUp/${role}`,async ({role = "User",email,password,confirmPassword,firstName,lastName,gender},thunkAPI) =>{
     const {rejectWithValue} = thunkAPI
     try {
-        const response = await request("User/signUp","POST",{
+        const endpoint = role === "User" ? "User/signUp" : "User/signUpAdmin"
+        const response = await request(endpoint,"POST",{
             email,
             password,
             confirmPassword,

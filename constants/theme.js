@@ -12,6 +12,18 @@ import SignOutIcon from '../assets/logout.png'
 import NoFood from '../assets/noFoods.png'
 import eye from '../assets/eye.png'
 import eyeClose from '../assets/eyeclose.png'
+import profileIcon from "../assets/profile.png"
+import closeIcon from "../assets/close.png"
+import adminIcon from "../assets/admin.png"
+import listIcon from "../assets/list.png"
+import arrowBack from '../assets/arrow_back.png'
+import avatar from '../assets/avatar.png'
+import burger from '../assets/burger.png'
+import homme from '../assets/homme.png'
+import fire from '../assets/fire.png'
+import search from '../assets/search.png'
+import aboutIcon from '../assets/information-button.png'
+import homeIcon from '../assets/home.png'
 
 
 import { Dimensions } from "react-native";
@@ -65,6 +77,18 @@ export const ICONS = {
     SignOutIcon,
     NoFood,
     eye,
-    eyeClose
+    eyeClose,
+    profileIcon,
+    closeIcon,
+    adminIcon,
+    listIcon,
+    arrowBack,
+    avatar,
+    burger,
+    homme,
+    fire,
+    search,
+    aboutIcon,
+    homeIcon
 }
 

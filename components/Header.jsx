@@ -4,9 +4,11 @@ import { COLORS, FONTS, SIZES } from '../constants'
 import CartIcon from './CartIcon'
 import BackButton from './BackButton'
 import { useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
 
 const Header =({title,isEnableIcon}) =>{
-  const navigation = useNavigation()  
+  const navigation = useNavigation()
+  const {role} = useSelector((state)=>state.auth)
   return (
     <View style={styles.header}>
         <BackButton goBack={navigation.goBack} />
@@ -19,7 +21,7 @@ const Header =({title,isEnableIcon}) =>{
                 </View>
             )
         }
-        {isEnableIcon && <CartIcon />}
+        {isEnableIcon &&  role!=="admin"  && <CartIcon />}
     </View>
   )
 }
