@@ -11,6 +11,7 @@ import AboutUsScreen from "../screens/AboutUs";
 import ProfileScreen from "../screens/Profile";
 import InfoFoodScreen from "../screens/InfoFood";
 import FoodsScreen from "../screens/Foods";
+import CategoryScreen from "../screens/Categories";
 import CheckoutScreen from "../screens/Checkout";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
@@ -21,6 +22,8 @@ import ModalWrapper from '../components/ModalWrapper';
 const Splash = "Splash";
 const Home = "Home";
 const Profile = "Profile";
+const Foods = "Foods";
+const Category = "Category";
 const AboutUs = "AboutUs";
 const MainTabs = "MainTabs";
 const Checkout = "Checkout";
@@ -30,6 +33,9 @@ const Stack = createStackNavigator();
 
 const TabNavigator = () => {
   const {items} = useSelector((state)=>state.carts)
+  const {role} = useSelector((state)=>state.auth)
+  const isAdmin = role === "admin"
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -41,6 +47,10 @@ const TabNavigator = () => {
             iconName = focused ? 'grid' : 'grid-outline';
           } else if (rn === Profile) {
             iconName = focused ? 'person-circle' : 'person-circle-outline';
+          } else if (rn === Foods) {
+            iconName = focused ? 'fast-food' : 'fast-food-outline';
+          } else if (rn === Category) {
+            iconName = focused ? 'list' : 'list-outline';
           } else if (rn === AboutUs) {
             iconName = focused ? 'layers' : 'layers-outline';
           } else if (rn === Checkout) {
@@ -82,10 +92,20 @@ const TabNavigator = () => {
         tabBarInactiveTintColor: '#757575',
       })}
     >
-      <Tab.Screen name={Home} component={HomeScren} />
-      <Tab.Screen name={Checkout} component={CheckoutScreen} />
-      <Tab.Screen name={Profile} component={ProfileScreen} />
-      <Tab.Screen name={AboutUs} component={AboutUsScreen} />
+      {isAdmin ? (
+        <>
+          <Tab.Screen name={Foods} component={FoodsScreen} />
+          <Tab.Screen name={Category} component={CategoryScreen} />
+          <Tab.Screen name={Profile} component={ProfileScreen} />
+        </>
+      ) : (
+        <>
+          <Tab.Screen name={Home} component={HomeScren} />
+          <Tab.Screen name={Checkout} component={CheckoutScreen} />
+          <Tab.Screen name={Profile} component={ProfileScreen} />
+          <Tab.Screen name={AboutUs} component={AboutUsScreen} />
+        </>
+      )}
     </Tab.Navigator>
   );
 }
@@ -103,9 +123,9 @@ const Navigation = () => {
         <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Foods" component={FoodsScreen} />
+        <Stack.Screen name="Category" component={CategoryScreen} />
         <Stack.Screen name="InfoFood" component={InfoFoodScreen} />
         <Stack.Screen name={MainTabs} component={TabNavigator} />
-        <Tab.Screen name={Checkout} component={CheckoutScreen} /> 
       </Stack.Navigator>
       {isModalVisible && <ModalWrapper/>}
     </NavigationContainer>

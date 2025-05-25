@@ -231,19 +231,6 @@ const styles = StyleSheet.create({
         marginVertical: 15,
         marginHorizontal: 2,
     },
-    button: {
-        backgroundColor: COLORS.second,
-        padding: SIZES.small + 4,
-        width: "100%",
-        alignItems: "center",
-        borderRadius: SIZES.medium,
-        marginVertical: 10,
-    },
-    textButton: {
-        color: COLORS.white,
-        fontFamily: FONTS.semiBold,
-        fontSize: SIZES.large,
-    },
 })
 
 export default FormSignUp;

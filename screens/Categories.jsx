@@ -58,14 +58,10 @@ const Categories = () => {
                 <Buttons
                     Icon={<Ionicons name={"pencil-outline"} size={35} />} 
                     pressHandler={() => haneleEditCategory(item)}
-                    stylesText={styles.textButton}
-                    stylesButton={styles.button}
                 />
                 <Buttons
                     Icon={<Ionicons name={"trash-outline"} size={35} />}
                     pressHandler={() => handleDeleteCategory(item)}
-                    stylesText={styles.textButton}
-                    stylesButton={styles.button}
                 />
             </View>
         </View>
@@ -87,9 +83,6 @@ const Categories = () => {
                     <Buttons
                         Icon={<Ionicons name={"close-circle-outline"} size={35} />}
                         title={"Cancel"}
-                        pressHandler={handleCancel}
-                        stylesText={styles.cancelTextButton}
-                        stylesButton={styles.button}
                     />
                     {
                     editCategory ? (
@@ -97,16 +90,12 @@ const Categories = () => {
                             Icon={<Ionicons name={"pencil-outline"} size={35} />} 
                             title={"Edit"}
                             pressHandler={handleSaveEdit}
-                            stylesText={styles.textButton}
-                            stylesButton={styles.button}
                         />
                     ) : (
                         <Buttons
                             title={"Add"}
                             Icon={<Ionicons name={"add-circle-outline"} size={35} />} 
                             pressHandler={handleAddCategory}
-                            stylesText={styles.textButton}
-                            stylesButton={styles.button}
                         />
                         ) 
                     }

@@ -149,11 +149,11 @@ const CustomeContent = ({item, isLastItem, isEnableChangeContent, isHome, isArti
 
   return (
     <TouchableOpacity 
-      className={`
-        ${isEnableChangeContent 
-          ? 'bg-white rounded-3xl shadow-lg mb-6 mx-4 overflow-hidden' 
-          : 'w-[${Math.floor(cardWidth/2-20)}px] mx-2 mb-4'}
-      `}
+      className={
+        isEnableChangeContent 
+          ? 'bg-white rounded-3xl shadow-lg mb-6 mx-4 overflow-hidden'
+          : `w-[${Math.floor(cardWidth/2-20)}px] mx-2 mb-4`
+      }
       onPress={() => {
         if(!isArticle) {
           navigation.navigate('InfoFood',{item})

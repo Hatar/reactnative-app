@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native'
 import Background from '../components/Background'
-import { COLORS, ICONS } from '../constants';
+import { COLORS } from '../constants';
 import TextInput from '../components/TextInput';
 import Buttons from '../components/Buttons';
 import { useNavigation } from '@react-navigation/native';
@@ -11,8 +11,8 @@ import { actSignIn, clearStateAuth } from '../redux/slices/auth/authSlice';
 import Logo from '../components/Logo';
 
 const Signin = () => {
-    const [email, setEmail] = useState({ value: 'a2a@Uexample.com', error: '' })
-    const [password, setPassword] = useState({ value: '12An0&23b', error: '' })
+    const [email, setEmail] = useState({ value: 'adminAmin@Uexample.com', error: '' })
+    const [password, setPassword] = useState({ value: 'A2Pa$s1234', error: '' })
     const navigation = useNavigation()
     const dispatch = useDispatch();
     const { loading, error, user } = useSelector((state) => state.auth);
