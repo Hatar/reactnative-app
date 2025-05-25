@@ -15,7 +15,7 @@ import { COLORS, FONTS, SIZES } from "../constants";
 import { actSignUp } from "../redux/slices/auth/authSlice";
 import { actEditSubAdmin } from "../redux/slices/admin/adminSlice";
 
-const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm}) => {
+const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm, onFeedback }) => {
   
     const { error, loading } = useSelector((state) => state.auth);
   const navigation = useNavigation();
@@ -68,12 +68,14 @@ const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm}) => {
         isValid = false;
       }
     }
+
     // If all validations pass, proceed with Firebase authentication
     if (isValid) {
-      let sendPayload = null
-      let response= null
+      let sendPayload = null;
+      let response = null;
+      
       if(tabName !== "updateTab") {
-        sendPayload ={
+        sendPayload = {
           role,
           email: email.value,
           password: password.value,
@@ -82,27 +84,41 @@ const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm}) => {
           lastName: lastname.value,
           gender,
         }
-        response = await dispatch(actSignUp(sendPayload))
+        response = await dispatch(actSignUp(sendPayload));
+        
         if (response?.payload?.message === "user ajouté avec succès") {
-          setToggleForm("listTab")
+          if(role === "Admin") {
+            dispatch(actGetListAdmin());
+            setToggleForm("listTab");
+            if (onFeedback) onFeedback('success', 'Admin created successfully!');
+            await navigation.navigate("Home");
+          } else {
+            if (onFeedback) onFeedback('success', 'User created successfully!');
+            await navigation.navigate("Signin");
+          }
+        } else {
+          if (onFeedback) {
+            onFeedback('error', response?.payload?.message || 'Failed to create user');
+          }
         }
+
       } else if (tabName === "updateTab") {
-        sendPayload ={
-          userId:adminData.userId,
+        sendPayload = {
+          userId: adminData.userId,
           firstName: firstname.value,
           lastName: lastname.value,
           email: email.value
         }
-        response = await dispatch(actEditSubAdmin(sendPayload))
+        response = await dispatch(actEditSubAdmin(sendPayload));
+        
         if (response?.payload?.message === "User updated successfully") {
-          setToggleForm("listTab")
-        }
-      }
-      if (response?.payload?.message === "user ajouté avec succès") {
-        if(role ==="Admin"){
-          await navigation.navigate("Home");
+          dispatch(actGetListAdmin());
+          setToggleForm("listTab");
+          if (onFeedback) onFeedback('success', 'Admin updated successfully!');
         } else {
-          await navigation.navigate("Signin");
+          if (onFeedback) {
+            onFeedback('error', response?.payload?.message || 'Failed to update admin');
+          }
         }
       }
     }
@@ -206,7 +222,7 @@ const FormSignUp = ({ role ,adminData,clearForm,tabName,setToggleForm}) => {
         <ActivityIndicator size="large" color={COLORS.bg} />
       ) : (
         <Buttons
-          title={role === "Admin" && tabName == "updateTab" ? "Update Admin" : role !== "Admin" ? "Sign Up" : "Admin Admin" }
+          title={role === "Admin" && tabName == "updateTab" ? "Update" : role !== "Admin" ? "Sign Up" : "Add" }
           pressHandler={onSignUpPressed}
           stylesButton="w-full h-14 bg-primary rounded-lg justify-center items-center"
           stylesText="text-xl text-black font-bold"

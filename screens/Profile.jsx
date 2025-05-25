@@ -1,4 +1,4 @@
-import { SafeAreaView, Text, View, StyleSheet, FlatList, TouchableOpacity, ScrollView } from "react-native";
+import { SafeAreaView, Text, View, FlatList, TouchableOpacity, ScrollView, Alert } from "react-native";
 import FormSignUp from "../components/FormSignUp";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +16,7 @@ const Profile = () => {
   const [adminData, setAdminData] = useState(null);
   const [clearForm, setClearForm] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [feedback, setFeedback] = useState({ type: null, message: "" });
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { admins } = useSelector((state) => state.admin);
@@ -27,13 +28,17 @@ const Profile = () => {
     }
   }, [role]);
 
-  const handleAdmin = (type, data) => {
+  const handleAdmin = async (type, data) => {
     if (type === "delete") {
       dispatch(toggleModalWrapper(true));
       dispatch(setItemModalWrapper({ typeModal: "DELETE_SUB_ADMIN", itemModal: data }));
+      handleFormFeedback('success', 'Admin deleted successfully!');
     } else if (type === "edit") {
       setAdminData(data);
       setToggleForm("updateTab");
+      handleFormFeedback('success', 'Admin ready to edit');
+    } else {
+      handleFormFeedback('error', 'Operation failed');
     }
   };
 
@@ -46,6 +51,7 @@ const Profile = () => {
       setAdminData(null);
       setClearForm(true);
     }
+    setFeedback({ type: null, message: "" });
   };
 
   const handleSignOut = () => {
@@ -53,21 +59,24 @@ const Profile = () => {
     navigation.replace("Signin");
   };
 
+  const handleFormFeedback = (type, message) => {
+    setFeedback({ type, message });
+    Alert.alert(type === "success" ? "Success" : "Error", message);
+  };
+
   const renderListAdmin = ({ item }) => (
-    <View key={item.userId} style={styles.categoryWrapper}>
-      <Text style={styles.category_name}>{item.gender}, {`${item.firstName}-${item.lastName}`}</Text>
-      <View style={styles.btns}>
+    <View key={item.userId} className="flex-row justify-between items-center gap-2 py-3 border-b border-gray-100 bg-white rounded-xl mb-2 px-3 shadow-sm">
+      <Text className="text-darkText text-base font-semibold">{item.gender}, {`${item.firstName}-${item.lastName}`}</Text>
+      <View className="flex-row gap-2">
         <Buttons
-          Icon={<Ionicons name={"pencil-outline"} size={35} />}
+          Icon={<Ionicons name={"pencil-outline"} size={28} color="#f9c32d" />}
           pressHandler={() => handleAdmin("edit", item)}
-          stylesText={styles.textButton}
-          stylesButton={styles.btn_action}
+          stylesButton="bg-primary/10 p-2 rounded-lg"
         />
         <Buttons
-          Icon={<Ionicons name={"trash-outline"} size={35} />}
+          Icon={<Ionicons name={"trash-outline"} size={28} color="#ef4444" />}
           pressHandler={() => handleAdmin("delete", item)}
-          stylesText={styles.textButton}
-          stylesButton={styles.btn_action}
+          stylesButton="bg-red-100 p-2 rounded-lg"
         />
       </View>
     </View>
@@ -154,44 +163,49 @@ const Profile = () => {
   );
 
   const renderAdminDashboard = () => (
-    <View className="flex-1 p-3 mt-5">
-      <Text className="text-3xl font-bold text-darkText mb-2">
-        Manage Sub Admins
-      </Text>
-      <Text className="text-base text-grayText mb-6">
-        Create and manage sub-admin accounts
-      </Text>
+    <View className="flex-1 p-4 mt-5">
+      <Text className="text-3xl font-bold text-darkText mb-2">Manage Sub Admins</Text>
+      <Text className="text-base text-grayText mb-6">Create and manage sub-admin accounts</Text>
 
-      <View className="flex-row justify-start mb-4">
+      <View className="flex-row gap-2 mb-4">
         <Buttons
-          Icon={<Ionicons name={"add-circle-outline"} size={35} />}
+          Icon={<Ionicons name={"add-circle-outline"} size={28} />}
           pressHandler={() => handleToggleTabSelected("createTab")}
-          stylesText={styles.textButton}
-          stylesButton={styles.button}
+          stylesButton="bg-primary/90 px-4 py-2 rounded-xl flex-row items-center"
+          stylesText="text-black font-semibold text-base ml-2"
+          title="Add New Admin"
         />
         <Buttons
           pressHandler={() => handleToggleTabSelected("listTab")}
-          stylesText={styles.textButton}
-          stylesButton={styles.button}
+          stylesButton="bg-gray-200 px-4 py-2 rounded-xl flex-row items-center"
+          stylesText="text-darkText font-semibold text-base"
+          title="Show List"
         />
       </View>
 
-      {toggleForm === "createTab" || toggleForm === "updateTab" ? (
-        <FormSignUp
-          role={"Admin"}
-          adminData={adminData}
-          clearForm={clearForm}
-          tabName={toggleForm}
-          setToggleForm={setToggleForm}
-        />
-      ) : admins.length > 0 && (
+      {(toggleForm === "createTab" || toggleForm === "updateTab") ? (
+        <View className="bg-white rounded-2xl p-4 shadow-md">
+          <FormSignUp
+            role={"Admin"}
+            adminData={adminData}
+            clearForm={clearForm}
+            tabName={toggleForm}
+            setToggleForm={setToggleForm}
+            onFeedback={handleFormFeedback}
+          />
+        </View>
+      ) : admins.length > 0 ? (
         <FlatList
           data={admins}
           renderItem={renderListAdmin}
           keyExtractor={(item) => String(item.userId)}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ overflow: "auto" }}
+          contentContainerStyle={{ paddingBottom: 40 }}
         />
+      ) : (
+        <View className="flex-1 items-center justify-center mt-10">
+          <Text className="text-gray-400 text-lg">No sub-admins found.</Text>
+        </View>
       )}
     </View>
   );
@@ -209,45 +223,5 @@ const Profile = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: COLORS.second,
-    padding: SIZES.small + 4,
-    alignItems: "center",
-    borderRadius: SIZES.medium,
-    marginVertical: 10,
-    marginRight: 5
-  },
-  btn_action: {
-    backgroundColor: COLORS.white,
-    padding: SIZES.small + 5,
-    alignItems: "center",
-    borderRadius: SIZES.medium,
-  },
-  textButton: {
-    color: COLORS.white,
-    fontFamily: FONTS.semiBold,
-    fontSize: SIZES.large,
-  },
-  categoryWrapper: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.white,
-  },
-  btns: {
-    flexDirection: "row",
-    gap: 5,
-  },
-  category_name: {
-    color: COLORS.darkText,
-    fontSize: SIZES.medium,
-    fontFamily: FONTS.semiBold,
-  }
-});
 
 export default Profile;

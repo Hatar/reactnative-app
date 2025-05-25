@@ -12,11 +12,15 @@ import ProfileScreen from "../screens/Profile";
 import InfoFoodScreen from "../screens/InfoFood";
 import FoodsScreen from "../screens/Foods";
 import CategoryScreen from "../screens/Categories";
+import DashboardScreen from "../screens/dashboard";
+
 import CheckoutScreen from "../screens/Checkout";
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useSelector } from 'react-redux';
-import { View, Text } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { View, Text, TouchableOpacity } from 'react-native';
 import ModalWrapper from '../components/ModalWrapper';
+import { useNavigation } from '@react-navigation/native';
+import { signOut } from '../redux/slices/auth/authSlice';
 
 //Screen names
 const Splash = "Splash";
@@ -27,6 +31,7 @@ const Category = "Category";
 const AboutUs = "AboutUs";
 const MainTabs = "MainTabs";
 const Checkout = "Checkout";
+const Dashboard = "Dashboard";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -34,7 +39,14 @@ const Stack = createStackNavigator();
 const TabNavigator = () => {
   const {items} = useSelector((state)=>state.carts)
   const {role} = useSelector((state)=>state.auth)
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
   const isAdmin = role === "admin"
+
+  const handleSignOut = () => {
+    dispatch(signOut());
+    navigation.replace('Signin');
+  };
 
   return (
     <Tab.Navigator
@@ -55,6 +67,8 @@ const TabNavigator = () => {
             iconName = focused ? 'layers' : 'layers-outline';
           } else if (rn === Checkout) {
             iconName = focused ? 'bag-handle' : 'bag-handle-outline';
+          } else if (rn === Dashboard) {
+            iconName = focused ? 'speedometer' : 'speedometer-outline';
           }
           
           return (
@@ -94,9 +108,23 @@ const TabNavigator = () => {
     >
       {isAdmin ? (
         <>
+          <Tab.Screen name={Dashboard} component={DashboardScreen} />
           <Tab.Screen name={Foods} component={FoodsScreen} />
           <Tab.Screen name={Category} component={CategoryScreen} />
           <Tab.Screen name={Profile} component={ProfileScreen} />
+          <Tab.Screen
+            name="Signout"
+            options={{
+              tabBarButton: (props) => (
+                <TouchableOpacity {...props} onPress={handleSignOut} style={{alignItems:'center',justifyContent:'center',flex:1}}>
+                  <Ionicons name="log-out-outline" size={28} color="#fb8c00" />
+                  <Text style={{fontSize:12, color:'#fb8c00', marginTop:2}}>Signout</Text>
+                </TouchableOpacity>
+              ),
+            }}
+          >
+            {null}
+          </Tab.Screen>
         </>
       ) : (
         <>
@@ -124,6 +152,7 @@ const Navigation = () => {
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Foods" component={FoodsScreen} />
         <Stack.Screen name="Category" component={CategoryScreen} />
+        <Stack.Screen name="Dashboard" component={DashboardScreen} />
         <Stack.Screen name="InfoFood" component={InfoFoodScreen} />
         <Stack.Screen name={MainTabs} component={TabNavigator} />
       </Stack.Navigator>
