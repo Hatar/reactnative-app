@@ -11,7 +11,7 @@ import { actSignIn, clearStateAuth } from '../redux/slices/auth/authSlice';
 import Logo from '../components/Logo';
 
 const Signin = () => {
-    const [email, setEmail] = useState({ value: 'adminAmin@Uexample.com', error: '' })
+    const [email, setEmail] = useState({ value: 'aminAdmin@Uexample.com', error: '' })
     const [password, setPassword] = useState({ value: 'A2Pa$s1234', error: '' })
     const navigation = useNavigation()
     const dispatch = useDispatch();
@@ -26,6 +26,7 @@ const Signin = () => {
             return
         } 
         const response = await dispatch(actSignIn({ email: email.value, password: password.value }))
+        console.log('Response from actSignIn:', response);
         if (!response.error) {
             navigation.replace('MainTabs');
         }

@@ -36,6 +36,8 @@ const Dashboard = "Dashboard";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+const DummyScreen = () => null;
+
 const TabNavigator = () => {
   const {items} = useSelector((state)=>state.carts)
   const {role} = useSelector((state)=>state.auth)
@@ -114,6 +116,7 @@ const TabNavigator = () => {
           <Tab.Screen name={Profile} component={ProfileScreen} />
           <Tab.Screen
             name="Signout"
+            component={DummyScreen}
             options={{
               tabBarButton: (props) => (
                 <TouchableOpacity {...props} onPress={handleSignOut} style={{alignItems:'center',justifyContent:'center',flex:1}}>
@@ -122,9 +125,7 @@ const TabNavigator = () => {
                 </TouchableOpacity>
               ),
             }}
-          >
-            {null}
-          </Tab.Screen>
+          />
         </>
       ) : (
         <>

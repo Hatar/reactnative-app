@@ -19,17 +19,17 @@ const Welcome = () => {
     {
       id: 1,
       image: ICONS.logo,
-      title: "Food in a Flash 1",
+      title: "Street Food on Wheels",
     },
     {
       id: 2,
       image: ICONS.logo,
-      title: "Foods in a Flash 2",
+      title: "Gourmet Food Truck Experience", 
     },
     {
       id: 3,
       image: ICONS.logo,
-      title: "Food in a Flash 3",
+      title: "Mobile Kitchen Delights",
     },
   ];
 

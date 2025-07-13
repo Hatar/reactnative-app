@@ -254,8 +254,8 @@ const Checkout = () => {
     }));
   }, [isPaymentPending, finalTotal]);
 
-  const deliveryFee = items.length > 0 ? 4.99 : 0;
-  const finalTotal = total + deliveryFee;
+  // const deliveryFee = items.length > 0 ? 4.99 : 0;
+  const finalTotal = total;
 
   const renderCartItem = ({ item }) => (
     <View className="px-4 mb-4">

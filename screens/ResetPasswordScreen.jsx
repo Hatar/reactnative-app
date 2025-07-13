@@ -1,25 +1,23 @@
-import React, {  useState } from 'react'
-import { ActivityIndicator, Image, StyleSheet, View } from 'react-native'
+import React, { useState } from 'react'
+import { ActivityIndicator, Image, View, Text } from 'react-native'
 import Background from '../components/Background'
-import { COLORS, FONTS, SIZES } from '../constants';
 import logo from '../assets/logo.png'
 import TextInput from '../components/TextInput';
 import Buttons from '../components/Buttons';
 import { useNavigation } from '@react-navigation/native';
 import { validationEmail } from '../helpers';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
 import BackButton from '../components/BackButton';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { FIREBASE_AUTH } from '../firebase';
-const ResetPasswordScreen =() => {
+import Logo from '../components/Logo';
 
-    const [email,setEmail] = useState({value:'',error:''})
-    const [loading,setLoading] = useState(false)
+const ResetPasswordScreen = () => {
+    const [email, setEmail] = useState({ value: '', error: '' })
+    const [loading, setLoading] = useState(false)
     const navigation = useNavigation()
-    
 
     // Handlers
-   const onPress = async() => {
+    const onPress = async () => {
         const emailError = validationEmail(email.value)
         setLoading(true);
         if (emailError) {
@@ -27,92 +25,47 @@ const ResetPasswordScreen =() => {
             setLoading(false);
             return
         } else {
-             try {
+            try {
                 // reset password
                 await sendPasswordResetEmail(FIREBASE_AUTH, email.value);
                 navigation.navigate('Signin')
-                } catch (error) {
-                    setLoading(false);
-                    alert('Error during signup:', error.message);
-                } finally {
-                    setLoading(false)
-                }
-}
+            } catch (error) {
+                setLoading(false);
+                alert('Error during signup:', error.message);
+            } finally {
+                setLoading(false)
+            }
+        }
     }
 
-
-  return (
-    <Background>
-        <BackButton goBack={navigation.goBack} styleBackButton={styles.styleBackButton} />
-        <View style={styles.imageContainer}
-        >
-            <View style={styles.imageCard}>
-                <Image style={styles.image} source={logo}/>
-            </View>
-        </View>
-      
-        <TextInput 
-            placeholder={'Enter Your Email'}
-            value={email.value}
-            errortext={email.error}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            returnKeyType="next"
-            onChangeText={(text) => setEmail({ value: text, error: '' })}
-        />
-
-{
-
-            loading  ? <ActivityIndicator size="large" color={COLORS.bg} /> : 
+    return (
+        <Background>
+            <Logo />
+            <Text className="text-2xl font-bold text-center text-primary mb-2">Reset Password</Text>
+            <Text className="text-base text-center text-gray-500 mb-6 px-6">Enter your email address and we'll send you a link to reset your password.</Text>
+            <TextInput
+                placeholder={'Enter Your Email'}
+                value={email.value}
+                errorText={email.error}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                returnKeyType="next"
+                onChangeText={(text) => setEmail({ value: text, error: '' })}
+                className="mb-4"
+            />
+            {loading ? (
+                <ActivityIndicator size="large" color="#f9c32d" className="my-4" />
+            ) : (
                 <Buttons
-                    title="Sign In"
+                    title="Send Reset Link"
                     pressHandler={onPress}
-                    stylesText={styles.textButton}
-                    stylesButton={styles.button}
+                    className="bg-primary py-4 w-4/5 mx-auto rounded-xl mt-2"
+                    textClassName="text-white text-lg font-semibold"
                 />
-            }
-
-        
-    </Background>
-  )
+            )}
+        </Background>
+    )
 }
-
-
-export const styles = StyleSheet.create({
-    imageContainer: {
-        top: -SIZES.small,
-        flexDirection: "row",
-        gap: SIZES.small,
-    },
-    imageCard: {
-        borderRadius: SIZES.medium,
-        padding: SIZES.small,
-        backgroundColor: COLORS.cardBg,
-    },
-    image: {
-        width: 80,
-        height: 80,
-        borderRadius: SIZES.medium,
-    },
-    button: {
-        backgroundColor: COLORS.second,
-        padding: SIZES.small + 4,
-        width: '80%',
-        alignItems: "center",
-        borderRadius: SIZES.medium,
-        marginVertical:10,
-    },
-    textButton: {
-        color: COLORS.white,
-        fontFamily: FONTS.semiBold,
-        fontSize: SIZES.large,
-    },
-    styleBackButton:{
-        position:'absolute',
-        top: 50 + getStatusBarHeight(),
-        left: 0,
-    },
-})
 
 export default ResetPasswordScreen
